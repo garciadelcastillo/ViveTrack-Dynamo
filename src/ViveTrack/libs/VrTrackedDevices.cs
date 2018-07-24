@@ -6,8 +6,13 @@ using System.Text;
 using System.Threading.Tasks;
 using Valve.VR;
 
+using Autodesk.DesignScript.Runtime;
+using Autodesk.DesignScript.Interfaces;
+using Autodesk.DesignScript.Geometry;
+
 namespace ViveTrack
 {
+    [IsVisibleInDynamoLibrary(false)]
     public class VrTrackedDevices
     {
         public CVRSystem vr;

@@ -29,6 +29,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Release\ViveTrack.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="DesignScriptBuiltin, Version=2.0.1.5055, Culture=neutral, processorArchitecture=MSIL">
@@ -122,7 +123,7 @@
     <Compile Include="Devices.cs" />
     <Compile Include="libs\LighthouseTracking.cs" />
     <Compile Include="libs\OpenvrWrapper.cs" />
-    <Compile Include="libs\openvr_api.cs" />
+    <Compile Include="openvr_api.cs" />
     <Compile Include="libs\VrTrackedDevice.cs" />
     <Compile Include="libs\VrTrackedDevices.cs" />
     <Compile Include="Start.cs" />
@@ -132,9 +133,24 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="libs\openvr_api.dll" />
+    <Content Include="openvr_api.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>IF ($(ConfigurationName)) == (Debug) GOTO END
+cd $(ProjectDir)
+cd..
+cd..
+cd package/ViveTrack/bin
+copy /y "$(ProjectDir)$(OutDir)ViveTrack.dll" ViveTrack.dll
+copy /y "$(ProjectDir)$(OutDir)ViveTrack.xml" ViveTrack.xml
+copy /y "$(ProjectDir)$(OutDir)openvr_api.dll" openvr_api.dll
+echo "IF CHANGES WERE MADE TO THE RESOURCE FILES, PLEASE FORCE BUILD AGAIN"
+"C:\Program Files\Autodesk\Dynamo Studio 2017\DynamoStudio.exe"
+:END</PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

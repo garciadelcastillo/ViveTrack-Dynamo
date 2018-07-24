@@ -9,10 +9,16 @@ using System;
 using System.Runtime.InteropServices;
 using Valve.VR;
 
+using Autodesk.DesignScript.Runtime;
+using Autodesk.DesignScript.Interfaces;
+using Autodesk.DesignScript.Geometry;
+
+
 namespace Valve.VR
 {
 
     [StructLayout(LayoutKind.Sequential)]
+    [IsVisibleInDynamoLibrary(false)]
     public struct IVRSystem
     {
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
@@ -237,6 +243,7 @@ namespace Valve.VR
 
     }
 
+    [IsVisibleInDynamoLibrary(false)]
     [StructLayout(LayoutKind.Sequential)]
     public struct IVRExtendedDisplay
     {
@@ -258,6 +265,7 @@ namespace Valve.VR
     }
 
     [StructLayout(LayoutKind.Sequential)]
+    [IsVisibleInDynamoLibrary(false)]
     public struct IVRTrackedCamera
     {
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
@@ -323,6 +331,7 @@ namespace Valve.VR
     }
 
     [StructLayout(LayoutKind.Sequential)]
+    [IsVisibleInDynamoLibrary(false)]
     public struct IVRApplications
     {
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
@@ -478,6 +487,7 @@ namespace Valve.VR
     }
 
     [StructLayout(LayoutKind.Sequential)]
+    [IsVisibleInDynamoLibrary(false)]
     public struct IVRChaperone
     {
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
@@ -523,6 +533,7 @@ namespace Valve.VR
     }
 
     [StructLayout(LayoutKind.Sequential)]
+    [IsVisibleInDynamoLibrary(false)]
     public struct IVRChaperoneSetup
     {
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
@@ -1403,6 +1414,10 @@ namespace Valve.VR
     }
 
 
+
+
+
+    [IsVisibleInDynamoLibrary(false)]
     public class CVRSystem
     {
         IVRSystem FnTable;
@@ -1631,7 +1646,7 @@ namespace Valve.VR
         }
     }
 
-
+    [IsVisibleInDynamoLibrary(false)]
     public class CVRExtendedDisplay
     {
         IVRExtendedDisplay FnTable;
@@ -1663,7 +1678,7 @@ namespace Valve.VR
         }
     }
 
-
+    [IsVisibleInDynamoLibrary(false)]
     public class CVRTrackedCamera
     {
         IVRTrackedCamera FnTable;
@@ -1741,7 +1756,7 @@ namespace Valve.VR
         }
     }
 
-
+    [IsVisibleInDynamoLibrary(false)]
     public class CVRApplications
     {
         IVRApplications FnTable;
@@ -1901,7 +1916,7 @@ namespace Valve.VR
         }
     }
 
-
+    [IsVisibleInDynamoLibrary(false)]
     public class CVRChaperone
     {
         IVRChaperone FnTable;
@@ -1949,7 +1964,7 @@ namespace Valve.VR
         }
     }
 
-
+    [IsVisibleInDynamoLibrary(false)]
     public class CVRChaperoneSetup
     {
         IVRChaperoneSetup FnTable;
@@ -2067,7 +2082,7 @@ namespace Valve.VR
         }
     }
 
-
+    [IsVisibleInDynamoLibrary(false)]
     public class CVRCompositor
     {
         IVRCompositor FnTable;
@@ -2235,7 +2250,7 @@ namespace Valve.VR
         }
     }
 
-
+    [IsVisibleInDynamoLibrary(false)]
     public class CVROverlay
     {
         IVROverlay FnTable;
@@ -2625,7 +2640,7 @@ namespace Valve.VR
         }
     }
 
-
+    [IsVisibleInDynamoLibrary(false)]
     public class CVRRenderModels
     {
         IVRRenderModels FnTable;
@@ -2722,7 +2737,7 @@ namespace Valve.VR
         }
     }
 
-
+    [IsVisibleInDynamoLibrary(false)]
     public class CVRNotifications
     {
         IVRNotifications FnTable;
@@ -2743,7 +2758,7 @@ namespace Valve.VR
         }
     }
 
-
+    [IsVisibleInDynamoLibrary(false)]
     public class CVRSettings
     {
         IVRSettings FnTable;
@@ -2806,7 +2821,7 @@ namespace Valve.VR
         }
     }
 
-
+    [IsVisibleInDynamoLibrary(false)]
     public class CVRScreenshots
     {
         IVRScreenshots FnTable;
@@ -2853,7 +2868,7 @@ namespace Valve.VR
         }
     }
 
-
+    [IsVisibleInDynamoLibrary(false)]
     public class CVRResources
     {
         IVRResources FnTable;
@@ -2873,7 +2888,7 @@ namespace Valve.VR
         }
     }
 
-
+    [IsVisibleInDynamoLibrary(false)]
     public class OpenVRInterop
     {
         [DllImportAttribute("openvr_api", EntryPoint = "VR_InitInternal")]
@@ -2895,22 +2910,26 @@ namespace Valve.VR
     }
 
 
+    [IsVisibleInDynamoLibrary(false)]
     public enum EVREye
     {
         Eye_Left = 0,
         Eye_Right = 1,
     }
+    [IsVisibleInDynamoLibrary(false)]
     public enum EGraphicsAPIConvention
     {
         API_DirectX = 0,
         API_OpenGL = 1,
     }
+    [IsVisibleInDynamoLibrary(false)]
     public enum EColorSpace
     {
         Auto = 0,
         Gamma = 1,
         Linear = 2,
     }
+    [IsVisibleInDynamoLibrary(false)]
     public enum ETrackingResult
     {
         Uninitialized = 1,
@@ -2919,6 +2938,7 @@ namespace Valve.VR
         Running_OK = 200,
         Running_OutOfRange = 201,
     }
+    [IsVisibleInDynamoLibrary(false)]
     public enum ETrackedDeviceClass
     {
         Invalid = 0,
@@ -2928,18 +2948,21 @@ namespace Valve.VR
         TrackingReference = 4,
         Other = 1000,
     }
+    [IsVisibleInDynamoLibrary(false)]
     public enum ETrackedControllerRole
     {
         Invalid = 0,
         LeftHand = 1,
         RightHand = 2,
     }
+    [IsVisibleInDynamoLibrary(false)]
     public enum ETrackingUniverseOrigin
     {
         TrackingUniverseSeated = 0,
         TrackingUniverseStanding = 1,
         TrackingUniverseRawAndUncalibrated = 2,
     }
+    [IsVisibleInDynamoLibrary(false)]
     public enum ETrackedDeviceProperty
     {
         Prop_TrackingSystemName_String = 1000,
@@ -3030,6 +3053,7 @@ namespace Valve.VR
         Prop_VendorSpecific_Reserved_Start = 10000,
         Prop_VendorSpecific_Reserved_End = 10999,
     }
+    [IsVisibleInDynamoLibrary(false)]
     public enum ETrackedPropertyError
     {
         TrackedProp_Success = 0,
@@ -3043,12 +3067,14 @@ namespace Valve.VR
         TrackedProp_StringExceedsMaximumLength = 8,
         TrackedProp_NotYetAvailable = 9,
     }
+    [IsVisibleInDynamoLibrary(false)]
     public enum EVRSubmitFlags
     {
         Submit_Default = 0,
         Submit_LensDistortionAlreadyApplied = 1,
         Submit_GlRenderBuffer = 2,
     }
+    [IsVisibleInDynamoLibrary(false)]
     public enum EVRState
     {
         Undefined = -1,
@@ -3061,6 +3087,7 @@ namespace Valve.VR
         Standby = 6,
         Ready_Alert_Low = 7,
     }
+    [IsVisibleInDynamoLibrary(false)]
     public enum EVREventType
     {
         VREvent_None = 0,
@@ -3165,6 +3192,7 @@ namespace Valve.VR
         VREvent_VendorSpecific_Reserved_Start = 10000,
         VREvent_VendorSpecific_Reserved_End = 19999,
     }
+    [IsVisibleInDynamoLibrary(false)]
     public enum EDeviceActivityLevel
     {
         k_EDeviceActivityLevel_Unknown = -1,
@@ -3173,6 +3201,7 @@ namespace Valve.VR
         k_EDeviceActivityLevel_UserInteraction_Timeout = 2,
         k_EDeviceActivityLevel_Standby = 3,
     }
+    [IsVisibleInDynamoLibrary(false)]
     public enum EVRButtonId
     {
         k_EButton_System = 0,
@@ -3193,12 +3222,14 @@ namespace Valve.VR
         k_EButton_Dashboard_Back = 2,
         k_EButton_Max = 64,
     }
+    [IsVisibleInDynamoLibrary(false)]
     public enum EVRMouseButton
     {
         Left = 1,
         Right = 2,
         Middle = 4,
     }
+    [IsVisibleInDynamoLibrary(false)]
     public enum EVRControllerAxisType
     {
         k_eControllerAxis_None = 0,
@@ -3206,11 +3237,13 @@ namespace Valve.VR
         k_eControllerAxis_Joystick = 2,
         k_eControllerAxis_Trigger = 3,
     }
+    [IsVisibleInDynamoLibrary(false)]
     public enum EVRControllerEventOutputType
     {
         ControllerEventOutput_OSEvents = 0,
         ControllerEventOutput_VREvents = 1,
     }
+    [IsVisibleInDynamoLibrary(false)]
     public enum ECollisionBoundsStyle
     {
         COLLISION_BOUNDS_STYLE_BEGINNER = 0,
@@ -3220,6 +3253,7 @@ namespace Valve.VR
         COLLISION_BOUNDS_STYLE_NONE = 4,
         COLLISION_BOUNDS_STYLE_COUNT = 5,
     }
+    [IsVisibleInDynamoLibrary(false)]
     public enum EVROverlayError
     {
         None = 0,
@@ -3242,6 +3276,7 @@ namespace Valve.VR
         VROVerlayError_KeyboardAlreadyInUse = 26,
         NoNeighbor = 27,
     }
+    [IsVisibleInDynamoLibrary(false)]
     public enum EVRApplicationType
     {
         VRApplication_Other = 0,
@@ -3253,12 +3288,14 @@ namespace Valve.VR
         VRApplication_SteamWatchdog = 6,
         VRApplication_Max = 7,
     }
+    [IsVisibleInDynamoLibrary(false)]
     public enum EVRFirmwareError
     {
         None = 0,
         Success = 1,
         Fail = 2,
     }
+    [IsVisibleInDynamoLibrary(false)]
     public enum EVRNotificationError
     {
         OK = 0,
@@ -3267,6 +3304,7 @@ namespace Valve.VR
         InvalidOverlayHandle = 102,
         SystemWithUserValueAlreadyExists = 103,
     }
+    [IsVisibleInDynamoLibrary(false)]
     public enum EVRInitError
     {
         None = 0,
@@ -3346,6 +3384,7 @@ namespace Valve.VR
         VendorSpecific_HmdFound_ConfigFailedSanityCheck = 1113,
         Steam_SteamInstallationNotFound = 2000,
     }
+    [IsVisibleInDynamoLibrary(false)]
     public enum EVRScreenshotType
     {
         None = 0,
@@ -3355,11 +3394,13 @@ namespace Valve.VR
         MonoPanorama = 4,
         StereoPanorama = 5,
     }
+    [IsVisibleInDynamoLibrary(false)]
     public enum EVRScreenshotPropertyFilenames
     {
         Preview = 0,
         VR = 1,
     }
+    [IsVisibleInDynamoLibrary(false)]
     public enum EVRTrackedCameraError
     {
         None = 0,
@@ -3380,6 +3421,7 @@ namespace Valve.VR
         InvalidArgument = 114,
         InvalidFrameBufferSize = 115,
     }
+    [IsVisibleInDynamoLibrary(false)]
     public enum EVRTrackedCameraFrameType
     {
         Distorted = 0,
@@ -3387,6 +3429,7 @@ namespace Valve.VR
         MaximumUndistorted = 2,
         MAX_CAMERA_FRAME_TYPES = 3,
     }
+    [IsVisibleInDynamoLibrary(false)]
     public enum EVRApplicationError
     {
         None = 0,
@@ -3410,6 +3453,7 @@ namespace Valve.VR
         UnknownProperty = 202,
         InvalidParameter = 203,
     }
+    [IsVisibleInDynamoLibrary(false)]
     public enum EVRApplicationProperty
     {
         Name_String = 0,
@@ -3427,6 +3471,7 @@ namespace Valve.VR
         IsInstanced_Bool = 62,
         LastLaunchTime_Uint64 = 70,
     }
+    [IsVisibleInDynamoLibrary(false)]
     public enum EVRApplicationTransitionState
     {
         VRApplicationTransition_None = 0,
@@ -3434,6 +3479,7 @@ namespace Valve.VR
         VRApplicationTransition_WaitingForExternalLaunch = 11,
         VRApplicationTransition_NewAppLaunched = 20,
     }
+    [IsVisibleInDynamoLibrary(false)]
     public enum ChaperoneCalibrationState
     {
         OK = 1,
@@ -3447,15 +3493,18 @@ namespace Valve.VR
         Error_PlayAreaInvalid = 203,
         Error_CollisionBoundsInvalid = 204,
     }
+    [IsVisibleInDynamoLibrary(false)]
     public enum EChaperoneConfigFile
     {
         Live = 1,
         Temp = 2,
     }
+    [IsVisibleInDynamoLibrary(false)]
     public enum EChaperoneImportFlags
     {
         EChaperoneImport_BoundsOnly = 1,
     }
+    [IsVisibleInDynamoLibrary(false)]
     public enum EVRCompositorError
     {
         None = 0,
@@ -3469,11 +3518,13 @@ namespace Valve.VR
         SharedTexturesNotSupported = 106,
         IndexOutOfRange = 107,
     }
+    [IsVisibleInDynamoLibrary(false)]
     public enum VROverlayInputMethod
     {
         None = 0,
         Mouse = 1,
     }
+    [IsVisibleInDynamoLibrary(false)]
     public enum VROverlayTransformType
     {
         VROverlayTransform_Absolute = 0,
@@ -3481,6 +3532,7 @@ namespace Valve.VR
         VROverlayTransform_SystemOverlay = 2,
         VROverlayTransform_TrackedComponent = 3,
     }
+    [IsVisibleInDynamoLibrary(false)]
     public enum VROverlayFlags
     {
         None = 0,
@@ -3499,17 +3551,20 @@ namespace Valve.VR
         StereoPanorama = 13,
         SortWithNonSceneOverlays = 14,
     }
+    [IsVisibleInDynamoLibrary(false)]
     public enum EGamepadTextInputMode
     {
         k_EGamepadTextInputModeNormal = 0,
         k_EGamepadTextInputModePassword = 1,
         k_EGamepadTextInputModeSubmit = 2,
     }
+    [IsVisibleInDynamoLibrary(false)]
     public enum EGamepadTextInputLineMode
     {
         k_EGamepadTextInputLineModeSingleLine = 0,
         k_EGamepadTextInputLineModeMultipleLines = 1,
     }
+    [IsVisibleInDynamoLibrary(false)]
     public enum EOverlayDirection
     {
         Up = 0,
@@ -3518,6 +3573,7 @@ namespace Valve.VR
         Right = 3,
         Count = 4,
     }
+    [IsVisibleInDynamoLibrary(false)]
     public enum EVRRenderModelError
     {
         None = 0,
@@ -3534,6 +3590,7 @@ namespace Valve.VR
         NotEnoughTexCoords = 308,
         InvalidTexture = 400,
     }
+    [IsVisibleInDynamoLibrary(false)]
     public enum EVRComponentProperty
     {
         IsStatic = 1,
@@ -3542,12 +3599,14 @@ namespace Valve.VR
         IsPressed = 8,
         IsScrolled = 16,
     }
+    [IsVisibleInDynamoLibrary(false)]
     public enum EVRNotificationType
     {
         Transient = 0,
         Persistent = 1,
         Transient_SystemWithUserValue = 2,
     }
+    [IsVisibleInDynamoLibrary(false)]
     public enum EVRNotificationStyle
     {
         None = 0,
@@ -3556,6 +3615,7 @@ namespace Valve.VR
         Contact_Enabled = 201,
         Contact_Active = 202,
     }
+    [IsVisibleInDynamoLibrary(false)]
     public enum EVRSettingsError
     {
         None = 0,
@@ -3563,6 +3623,7 @@ namespace Valve.VR
         WriteFailed = 2,
         ReadFailed = 3,
     }
+    [IsVisibleInDynamoLibrary(false)]
     public enum EVRScreenshotError
     {
         None = 0,
@@ -3576,21 +3637,36 @@ namespace Valve.VR
     [StructLayout(LayoutKind.Explicit)]
     public struct VREvent_Data_t
     {
-        [FieldOffset(0)] public VREvent_Reserved_t reserved;
-        [FieldOffset(0)] public VREvent_Controller_t controller;
-        [FieldOffset(0)] public VREvent_Mouse_t mouse;
-        [FieldOffset(0)] public VREvent_Scroll_t scroll;
-        [FieldOffset(0)] public VREvent_Process_t process;
-        [FieldOffset(0)] public VREvent_Notification_t notification;
-        [FieldOffset(0)] public VREvent_Overlay_t overlay;
-        [FieldOffset(0)] public VREvent_Status_t status;
-        [FieldOffset(0)] public VREvent_Ipd_t ipd;
-        [FieldOffset(0)] public VREvent_Chaperone_t chaperone;
-        [FieldOffset(0)] public VREvent_PerformanceTest_t performanceTest;
-        [FieldOffset(0)] public VREvent_TouchPadMove_t touchPadMove;
-        [FieldOffset(0)] public VREvent_SeatedZeroPoseReset_t seatedZeroPoseReset;
-        [FieldOffset(0)] public VREvent_Screenshot_t screenshot;
-        [FieldOffset(0)] public VREvent_Keyboard_t keyboard; // This has to be at the end due to a mono bug
+        [FieldOffset(0)]
+        public VREvent_Reserved_t reserved;
+        [FieldOffset(0)]
+        public VREvent_Controller_t controller;
+        [FieldOffset(0)]
+        public VREvent_Mouse_t mouse;
+        [FieldOffset(0)]
+        public VREvent_Scroll_t scroll;
+        [FieldOffset(0)]
+        public VREvent_Process_t process;
+        [FieldOffset(0)]
+        public VREvent_Notification_t notification;
+        [FieldOffset(0)]
+        public VREvent_Overlay_t overlay;
+        [FieldOffset(0)]
+        public VREvent_Status_t status;
+        [FieldOffset(0)]
+        public VREvent_Ipd_t ipd;
+        [FieldOffset(0)]
+        public VREvent_Chaperone_t chaperone;
+        [FieldOffset(0)]
+        public VREvent_PerformanceTest_t performanceTest;
+        [FieldOffset(0)]
+        public VREvent_TouchPadMove_t touchPadMove;
+        [FieldOffset(0)]
+        public VREvent_SeatedZeroPoseReset_t seatedZeroPoseReset;
+        [FieldOffset(0)]
+        public VREvent_Screenshot_t screenshot;
+        [FieldOffset(0)]
+        public VREvent_Keyboard_t keyboard; // This has to be at the end due to a mono bug
     }
 
     [StructLayout(LayoutKind.Sequential)]
@@ -4020,6 +4096,8 @@ namespace Valve.VR
         public IntPtr m_pVRScreenshots; // class vr::IVRScreenshots *
     }
 
+
+    [IsVisibleInDynamoLibrary(false)]
     public class OpenVR
     {
 

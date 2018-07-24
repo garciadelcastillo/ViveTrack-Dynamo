@@ -11,8 +11,13 @@ using System.Numerics;
 //using Rhino.Collections;
 using Quaternion = System.Numerics.Quaternion;
 
+using Autodesk.DesignScript.Runtime;
+using Autodesk.DesignScript.Interfaces;
+using Autodesk.DesignScript.Geometry;
+
 namespace ViveTrack
 {
+    [IsVisibleInDynamoLibrary(false)]
     public class VrTrackedDevice
     {
         public string device_class;
