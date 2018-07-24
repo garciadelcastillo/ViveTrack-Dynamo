@@ -34,6 +34,11 @@ namespace ViveTrack
         //public Vector3d CorrectedTranslation;
         public Quaternion CorrectedQuaternion;
 
+        public Vector3 Translation;
+        public Vector3 CorrectedTranslation;
+        public Matrix4x4 CorrectedMatrix4x4;
+        
+
         internal List<object> TriggerStates;
         internal bool TriggerClicked;
         internal bool TriggerPressed;
@@ -115,32 +120,61 @@ namespace ViveTrack
             return "unknown";
         }
 
-        //public void ConvertPose()
-        //{
-        //    GetTranslationFromPose();
-        //    GetQuaternionFromPose();
-        //    GetCorrectedTranslation();
-        //    GetCorrectedQuaternion();
-        //    GetCorrectedMatrix4X4();
-        //}
+        public void ConvertPose()
+        {
+            GetTranslationFromPose();
+            GetQuaternionFromPose();
+            GetCorrectedTranslation();
+            GetCorrectedQuaternion();
+            GetCorrectedMatrix4X4();
+        }
 
-        //public void GetCorrectedMatrix4X4()
-        //{
-        //    Matrix4x4 translationMatrix = Matrix4x4.Transpose(Matrix4x4.CreateTranslation(new Vector3((float)CorrectedTranslation.X, (float)CorrectedTranslation.Y, (float)CorrectedTranslation.Z)));
-        //    Matrix4x4 rotationMatrix = Matrix4x4.CreateFromQuaternion(CorrectedQuaternion);
-        //    rotationMatrix = Matrix4x4.Transpose(rotationMatrix);
-        //    Matrix4x4 multiply = Matrix4x4.Multiply(translationMatrix,rotationMatrix);
-        //    CorrectedMatrix4X4 = ConvertFromSystemMatrixToRhinoMatrix(multiply);
+        public void GetTranslationFromPose()
+        {
+            this.Translation = new Vector3(Pose.m3, Pose.m7, Pose.m11);
+        }
 
-        //    //Transform the matrix by calibration matrix
-        //    CorrectedMatrix4X4 = Transform.Multiply(StartVive.CalibrationTransform, CorrectedMatrix4X4);
-        //}
+        public void GetQuaternionFromPose()
+        {
+            var w = Math.Sqrt(Math.Max(0, 1 + Pose.m0 + Pose.m5 + Pose.m10)) / 2;
+            var x = Math.Sqrt(Math.Max(0, 1 + Pose.m0 - Pose.m5 - Pose.m10)) / 2;
+            var y = Math.Sqrt(Math.Max(0, 1 - Pose.m0 + Pose.m5 - Pose.m10)) / 2;
+            var z = Math.Sqrt(Math.Max(0, 1 - Pose.m0 - Pose.m5 + Pose.m10)) / 2;
+            x = Math.Abs(x) * Math.Sign(Pose.m9 - Pose.m6);
+            y = Math.Abs(y) * Math.Sign(Pose.m2 - Pose.m8);
+            z = Math.Abs(z) * Math.Sign(Pose.m4 - Pose.m1);
+            this.Quaternion = new Quaternion((float)x, (float)y, (float)z, (float)w);
+        }
+
+        public void GetCorrectedTranslation()
+        {
+            this.CorrectedTranslation = new Vector3(Translation.X, -Translation.Z, Translation.Y);
+        }
+
+        public void GetCorrectedQuaternion()
+        {
+            this.CorrectedQuaternion = new Quaternion(Quaternion.X, -Quaternion.Z, Quaternion.Y, Quaternion.W);
+        }
+
+        public void GetCorrectedMatrix4X4()
+        {
+            Matrix4x4 translationMatrix = Matrix4x4.Transpose(Matrix4x4.CreateTranslation(new Vector3(CorrectedTranslation.X, CorrectedTranslation.Y, CorrectedTranslation.Z)));
+            Matrix4x4 rotationMatrix = Matrix4x4.CreateFromQuaternion(CorrectedQuaternion);
+            rotationMatrix = Matrix4x4.Transpose(rotationMatrix);
+            //Matrix4x4 multiply = Matrix4x4.Multiply(translationMatrix, rotationMatrix);
+            //CorrectedMatrix4X4 = ConvertFromSystemMatrixToRhinoMatrix(multiply);
+            this.CorrectedMatrix4x4 = Matrix4x4.Multiply(translationMatrix, rotationMatrix);
+
+            ////Transform the matrix by calibration matrix
+            //CorrectedMatrix4X4 = Transform.Multiply(StartVive.CalibrationTransform, CorrectedMatrix4X4);
+            //this.CorrectedMatrix4x4 = Matrix4x4.Multiply(Start.CalibrationTransform, this.CorrectedMatrix4x4);  // @TODO: review if this is the correct multiplication order...
+        }
 
         //public void GetTrackerCorrectedMatrix4X4()
         //{
         //    Matrix4x4 oldMatrix = ConvertFromRhinoMatrixToSystemMatrix(new Matrix(CorrectedMatrix4X4));
         //    Matrix4x4 transformMatrix4X4 = new Matrix4x4(-1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1);
-            
+
         //    Matrix4x4 newMatrix4X4 = Matrix4x4.Multiply(oldMatrix,transformMatrix4X4);
         //    CorrectedMatrix4X4 = ConvertFromSystemMatrixToRhinoMatrix(newMatrix4X4);
         //}
@@ -179,32 +213,13 @@ namespace ViveTrack
         //    return t;
         //}
 
-        //public void GetCorrectedTranslation()
-        //{
-        //    CorrectedTranslation = new Vector3d(Translation.X,-Translation.Z,Translation.Y);
-        //}
 
-        //public void GetCorrectedQuaternion()
-        //{
-        //    CorrectedQuaternion = new Quaternion(Quaternion.X,-Quaternion.Z,Quaternion.Y,Quaternion.W);
-        //}
 
-        //public void GetTranslationFromPose()
-        //{
-        //    this.Translation = new Vector3d(Pose.m3, Pose.m7, Pose.m11);
-        //}
 
-        //public void GetQuaternionFromPose()
-        //{
-        //    var w = Math.Sqrt(Math.Max(0, 1 + Pose.m0 + Pose.m5 + Pose.m10)) / 2;
-        //    var x = Math.Sqrt(Math.Max(0, 1 + Pose.m0 - Pose.m5 - Pose.m10)) / 2;
-        //    var y = Math.Sqrt(Math.Max(0, 1 - Pose.m0 + Pose.m5 - Pose.m10)) / 2;
-        //    var z = Math.Sqrt(Math.Max(0, 1 - Pose.m0 - Pose.m5 + Pose.m10)) / 2;
-        //    x = Math.Abs(x) * Math.Sign(Pose.m9 - Pose.m6);
-        //    y = Math.Abs(y) * Math.Sign(Pose.m2 - Pose.m8);
-        //    z = Math.Abs(z) * Math.Sign(Pose.m4 - Pose.m1);
-        //    this.Quaternion = new Quaternion((float)x,(float)y, (float)z, (float)w);
-        //}
+
+
+
+
 
         public override string ToString()
         {

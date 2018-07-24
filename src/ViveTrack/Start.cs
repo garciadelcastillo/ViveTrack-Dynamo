@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Diagnostics;
 
+using System.Numerics;
+
 using Autodesk.DesignScript.Runtime;
 using Autodesk.DesignScript.Interfaces;
 using Autodesk.DesignScript.Geometry;
@@ -18,8 +20,9 @@ public class Start
     internal Start() { }
 
     public static OpenvrWrapper Vive = new OpenvrWrapper();
-    public static CoordinateSystem CalibrationTransform = CoordinateSystem.Identity();
-    public static Plane CalibrationPlane;
+    public static Matrix4x4 CalibrationTransform = Matrix4x4.Identity;
+    //public static CoordinateSystem CalibrationTransform = CoordinateSystem.Identity();
+    //public static Plane CalibrationPlane;
     public static string OutMsg;
 
 
@@ -30,7 +33,7 @@ public class Start
     /// <returns></returns>
     [CanUpdatePeriodically(true)]
     [MultiReturn(new[] { "Msg", "Vive" })]
-    public static object ConnectToVive(bool Connect)
+    public static Dictionary<string, object> ConnectToVive(bool Connect = true)
     {
         if (!Connect) return null;
 
@@ -40,8 +43,18 @@ public class Start
             return null;
         }
 
-        OutMsg = "Connected!";
-
+        Vive.Connect();
+        Vive.Update();
+        if (Vive.Success)
+        {
+            OutMsg = Vive.TrackedDevices.Summary();
+            Vive.TrackedDevices.UpdatePoses();
+        }
+        else
+        {
+            OutMsg = "Vive is not setup correctly!! Detailed Reason:\n" + Vive.errorMsg + "\nCheck online the error code for more information.";
+            Vive.Connect();
+        }
 
         return new Dictionary<string, object> {
             { "Msg", OutMsg },
