@@ -165,9 +165,9 @@ namespace ViveTrack
             //CorrectedMatrix4X4 = ConvertFromSystemMatrixToRhinoMatrix(multiply);
             this.CorrectedMatrix4x4 = Matrix4x4.Multiply(translationMatrix, rotationMatrix);
 
-            ////Transform the matrix by calibration matrix
+            //Transform the matrix by calibration matrix
             //CorrectedMatrix4X4 = Transform.Multiply(StartVive.CalibrationTransform, CorrectedMatrix4X4);
-            //this.CorrectedMatrix4x4 = Matrix4x4.Multiply(Start.CalibrationTransform, this.CorrectedMatrix4x4);  // @TODO: review if this is the correct multiplication order...
+            this.CorrectedMatrix4x4 = Matrix4x4.Multiply(Start.CalibrationTransform, this.CorrectedMatrix4x4);  // @TODO: review if this is the correct multiplication order...
         }
 
         public void CorrectGenericTrackerMatrix()

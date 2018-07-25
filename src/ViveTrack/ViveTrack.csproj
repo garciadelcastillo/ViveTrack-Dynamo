@@ -102,6 +102,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Numerics" />
     <Reference Include="System.Numerics.Vectors" />
     <Reference Include="System.Windows.Interactivity, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -128,6 +129,7 @@
     <Compile Include="libs\VrTrackedDevices.cs" />
     <Compile Include="Start.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Util.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -136,6 +138,25 @@
     <Content Include="openvr_api.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <None Include="Resources\Start.ConnectToVive.Small.png" />
+    <None Include="Resources\Start.ConnectToVive.Large.png" />
+    <None Include="Resources\Start.CalibrateOrigin.Small.png" />
+    <None Include="Resources\Start.CalibrateOrigin.Large.png" />
+    <None Include="Resources\Devices.Lighthouse2.Small.png" />
+    <None Include="Resources\Devices.Lighthouse2.Large.png" />
+    <None Include="Resources\Devices.Lighthouse1.Small.png" />
+    <None Include="Resources\Devices.Lighthouse1.Large.png" />
+    <None Include="Resources\Devices.HMD.Small.png" />
+    <None Include="Resources\Devices.HMD.Large.png" />
+    <None Include="Resources\Devices.GenericTracker.Small.png" />
+    <None Include="Resources\Devices.GenericTracker.Large.png" />
+    <None Include="Resources\Devices.Controller2.Small.png" />
+    <None Include="Resources\Devices.Controller2.Large.png" />
+    <None Include="Resources\Devices.Controller1.Small.png" />
+    <None Include="Resources\Devices.Controller1.Large.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\ViveTrackImages.resx" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
@@ -145,6 +166,7 @@ cd..
 cd..
 cd package/ViveTrack/bin
 copy /y "$(ProjectDir)$(OutDir)ViveTrack.dll" ViveTrack.dll
+copy /y "$(ProjectDir)$(OutDir)ViveTrack.customization.dll" ViveTrack.customization.dll
 copy /y "$(ProjectDir)$(OutDir)ViveTrack.xml" ViveTrack.xml
 copy /y "$(ProjectDir)$(OutDir)openvr_api.dll" openvr_api.dll
 echo "IF CHANGES WERE MADE TO THE RESOURCE FILES, PLEASE FORCE BUILD AGAIN"
@@ -158,4 +180,17 @@ echo "IF CHANGES WERE MADE TO THE RESOURCE FILES, PLEASE FORCE BUILD AGAIN"
   <Target Name="AfterBuild">
   </Target>
   -->
+  <Target Name="AfterBuild">
+    <!-- Get System.Drawing.dll -->
+    <GetReferenceAssemblyPaths TargetFrameworkMoniker=".NETFramework, Version=v2.0">
+      <Output TaskParameter="FullFrameworkReferenceAssemblyPaths" PropertyName="FrameworkAssembliesPath" />
+    </GetReferenceAssemblyPaths>
+    <!-- Get assembly -->
+    <GetAssemblyIdentity AssemblyFiles="$(OutDir)$(TargetName).dll">
+      <Output TaskParameter="Assemblies" ItemName="AssemblyInfo" />
+    </GetAssemblyIdentity>
+    <!-- Generate customization dll -->
+    <GenerateResource UseSourcePath="true" Sources="$(ProjectDir)\Resources\ViveTrackImages.resx" OutputResources="$(ProjectDir)\Resources\ViveTrackImages.resources" References="$(FrameworkAssembliesPath)System.Drawing.dll" />
+    <AL TargetType="library" EmbedResources="$(ProjectDir)\Resources\ViveTrackImages.resources" OutputAssembly="$(OutDir)ViveTrack.customization.dll" Version="%(AssemblyInfo.Version)" />
+  </Target>
 </Project>

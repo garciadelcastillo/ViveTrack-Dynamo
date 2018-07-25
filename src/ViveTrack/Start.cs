@@ -12,19 +12,26 @@ using Autodesk.DesignScript.Interfaces;
 using Autodesk.DesignScript.Geometry;
 
 using Valve.VR;
-
 using ViveTrack;
+
+using DSPlane = Autodesk.DesignScript.Geometry.Plane;
 
 public class Start
 {
     internal Start() { }
 
-    public static OpenvrWrapper Vive = new OpenvrWrapper();
-    public static Matrix4x4 CalibrationTransform = Matrix4x4.Identity;
-    //public static CoordinateSystem CalibrationTransform = CoordinateSystem.Identity();
-    //public static Plane CalibrationPlane;
-    public static string OutMsg;
 
+
+    //   ██████╗ ██████╗ ███╗   ██╗███╗   ██╗███████╗ ██████╗████████╗
+    //  ██╔════╝██╔═══██╗████╗  ██║████╗  ██║██╔════╝██╔════╝╚══██╔══╝
+    //  ██║     ██║   ██║██╔██╗ ██║██╔██╗ ██║█████╗  ██║        ██║   
+    //  ██║     ██║   ██║██║╚██╗██║██║╚██╗██║██╔══╝  ██║        ██║   
+    //  ╚██████╗╚██████╔╝██║ ╚████║██║ ╚████║███████╗╚██████╗   ██║   
+    //   ╚═════╝ ╚═════╝ ╚═╝  ╚═══╝╚═╝  ╚═══╝╚══════╝ ╚═════╝   ╚═╝   
+    //                                                                
+
+    public static OpenvrWrapper Vive = new OpenvrWrapper();
+    public static string OutMsg;
 
     /// <summary>
     /// Start HTC Vive. Make sure SteamVR is running, and Dynamo is set to Periodic update.
@@ -76,10 +83,35 @@ public class Start
 
 
 
+    //   ██████╗ █████╗ ██╗     ██╗██████╗ ██████╗  █████╗ ████████╗███████╗
+    //  ██╔════╝██╔══██╗██║     ██║██╔══██╗██╔══██╗██╔══██╗╚══██╔══╝██╔════╝
+    //  ██║     ███████║██║     ██║██████╔╝██████╔╝███████║   ██║   █████╗  
+    //  ██║     ██╔══██║██║     ██║██╔══██╗██╔══██╗██╔══██║   ██║   ██╔══╝  
+    //  ╚██████╗██║  ██║███████╗██║██████╔╝██║  ██║██║  ██║   ██║   ███████╗
+    //   ╚═════╝╚═╝  ╚═╝╚══════╝╚═╝╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝   ╚═╝   ╚══════╝
+    //                                                                      
 
-    public static object CalibrateOrigin()
+    public static Matrix4x4 CalibrationTransform = Matrix4x4.Identity;
+
+    /// <summary>
+    /// Reorient all the tracked devices according to the new Plane you set as origin plane.
+    /// </summary>
+    /// <param name="NewOriginPlane">New base Plane.</param>
+    /// <param name="calibrate">Should this plane be used for calibration?</param>
+    public static void CalibrateOrigin([DefaultArgumentAttribute("Plane.XY();")]DSPlane NewOriginPlane, bool calibrate = true)
     {
-        return null;
+        if (calibrate)
+        {
+            CalibrationTransform = Util.DSPlaneToMatrix4x4(NewOriginPlane);
+            CalibrationTransform = Matrix4x4.Multiply(CalibrationTransform, Matrix4x4.Identity);
+        }
+        else
+        {
+            CalibrationTransform = Matrix4x4.Identity;
+        }
+
     }
+
+
 }
 
