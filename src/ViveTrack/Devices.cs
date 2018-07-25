@@ -66,22 +66,6 @@ public class Devices
 
         }
 
-
-
-        //XyPlane = Plane.WorldXY;
-        //XyPlane.Transform(CurrenTrackedDevice.CorrectedMatrix4X4);
-        //if (!Paused)
-        //{
-        //    OldPlane = XyPlane;
-        //    OldTransform = CurrenTrackedDevice.CorrectedMatrix4X4;
-        //}
-
-        //var newHMD = HMD.Duplicate();
-        //newHMD.Transform(OldTransform);
-        //DA.SetData("HMD", newHMD);
-        //DA.SetData("Plane", OldPlane);
-        //DA.SetData("Matrix", OldTransform);
-
         return new Dictionary<string, object>()
         {
             { "HMD", null },
@@ -92,33 +76,24 @@ public class Devices
     }
 
 
-    public static Matrix4x4 trans4x4(double x = 5, double y = 10, double z = 15)
-    {
-        Matrix4x4 mm = Matrix4x4.CreateTranslation((float)x, (float)y, (float)z);
-        return mm;
-    }
 
-    public static Matrix4x4 AxisVector(Vector axis, double angle)
-    {
-        Vector3 v = new Vector3((float)axis.X, (float)axis.Y, (float)axis.Z);
-        Matrix4x4 mm = Matrix4x4.CreateFromAxisAngle(v, (float)angle);
-        return mm;
-    }
+    
 
-    public static DSPlane CoordinateSystemToPlane(CoordinateSystem cs)
+
+    internal static DSPlane CoordinateSystemToPlane(CoordinateSystem cs)
     {
         DSPlane pl = DSPlane.ByOriginXAxisYAxis(cs.Origin, cs.XAxis, cs.YAxis);
         return pl;
     }
 
-    public static CoordinateSystem Matrix4x4ToCoordinateSystem(Matrix4x4 m, bool transpose)
+    internal static CoordinateSystem Matrix4x4ToCoordinateSystem(Matrix4x4 m, bool transpose)
     {
         double[] mm = Matrix4x4ToDoubleArray(m, transpose);
         CoordinateSystem cs = CoordinateSystem.ByMatrix(mm);
         return cs;
     }
 
-    public static double[] Matrix4x4ToDoubleArray(Matrix4x4 m, bool transpose)
+    internal static double[] Matrix4x4ToDoubleArray(Matrix4x4 m, bool transpose)
     {
         double[] a = new double[16];
         if (transpose)
