@@ -20,7 +20,7 @@ using DSPlane = Autodesk.DesignScript.Geometry.Plane;
 //   ╚═════╝    ╚═╝   ╚═╝╚══════╝╚══════╝
 //                                       
 
-class Util
+static class Util
 {
 
 
@@ -50,40 +50,50 @@ class Util
 
     internal static double[] Matrix4x4ToDoubleArray(Matrix4x4 m, bool transpose)
     {
-        double[] a = new double[16];
+        double[] a;
         if (transpose)
         {
-            a[0] = m.M11; a[1] = m.M21; a[2] = m.M31; a[3] = m.M41;
-            a[4] = m.M12; a[5] = m.M22; a[6] = m.M32; a[7] = m.M42;
-            a[8] = m.M13; a[9] = m.M23; a[10] = m.M33; a[11] = m.M43;
-            a[12] = m.M14; a[13] = m.M24; a[14] = m.M34; a[15] = m.M44;
+            a = new double[] {
+                m.M11, m.M21, m.M31, m.M41,
+                m.M12, m.M22, m.M32, m.M42,
+                m.M13, m.M23, m.M33, m.M43,
+                m.M14, m.M24, m.M34, m.M44
+            };
         }
         else
         {
-            a[0] = m.M11; a[1] = m.M12; a[2] = m.M13; a[3] = m.M14;
-            a[4] = m.M21; a[5] = m.M22; a[6] = m.M23; a[7] = m.M24;
-            a[8] = m.M31; a[9] = m.M32; a[10] = m.M33; a[11] = m.M34;
-            a[12] = m.M41; a[13] = m.M42; a[14] = m.M43; a[15] = m.M44;
+            a = new double[] {
+                m.M11, m.M12, m.M13, m.M14,
+                m.M21, m.M22, m.M23, m.M24,
+                m.M31, m.M32, m.M33, m.M34,
+                m.M41, m.M42, m.M43, m.M44
+            };
         }
         return a;
     }
 
     internal static double[] DSPlaneToDoubleArray(DSPlane pl, bool transpose)
     {
-        double[] a = new double[16];
+        double[] a;
         if (transpose)
         {
-            a[0] = pl.XAxis.X; a[1] = pl.XAxis.Y; a[2] = pl.XAxis.Z; a[3] = 0;
-            a[4] = pl.YAxis.X; a[5] = pl.YAxis.Y; a[6] = pl.YAxis.Z; a[7] = 0;
-            a[8] = pl.Normal.X; a[9] = pl.Normal.Y; a[10] = pl.Normal.Z; a[11] = 0;
-            a[12] = pl.Origin.X; a[13] = pl.Origin.Y; a[14] = pl.Origin.Z; a[15] = 1;
+            a = new double[]
+            {
+               pl.XAxis.X, pl.XAxis.Y, pl.XAxis.Z, 0,
+               pl.YAxis.X, pl.YAxis.Y, pl.YAxis.Z, 0,
+               pl.Normal.X, pl.Normal.Y, pl.Normal.Z, 0,
+               pl.Origin.X, pl.Origin.Y, pl.Origin.Z, 1
+            };
         }
         else
         {
-            a[0] = pl.XAxis.X; a[1] = pl.YAxis.X; a[2] = pl.Normal.X; a[3] = pl.Origin.X;
-            a[4] = pl.XAxis.Y; a[5] = pl.YAxis.Y; a[6] = pl.Normal.Y; a[7] = pl.Origin.Y;
-            a[8] = pl.XAxis.Z; a[9] = pl.YAxis.Z; a[10] = pl.Normal.Z; a[11] = pl.Origin.Z;
-            a[12] = 0; a[13] = 0; a[14] = 0; a[15] = 1;
+            a = new double[]
+            {
+                pl.XAxis.X, pl.YAxis.X, pl.Normal.X, pl.Origin.X,
+                pl.XAxis.Y, pl.YAxis.Y, pl.Normal.Y, pl.Origin.Y,
+                pl.XAxis.Z, pl.YAxis.Z, pl.Normal.Z, pl.Origin.Z,
+                0, 0, 0, 1
+            };
         }
         return a;
     }
