@@ -80,7 +80,7 @@ public class Devices
 
         }
 
-        // @TODO: fiugre out mesh representation
+        // @TODO: figure out mesh representation
 
         return new Dictionary<string, object>()
         {
@@ -149,7 +149,7 @@ public class Devices
             _Controller1_OldPlane = CoordinateSystemToPlane(_Controller1_OldCS);
         }
 
-        // @TODO: fiugre out mesh representation
+        // @TODO: figure out mesh representation
 
         _Controller1_CurrentTrackedDevice.GetControllerTriggerState();
 
@@ -219,7 +219,7 @@ public class Devices
             _Controller2_OldPlane = CoordinateSystemToPlane(_Controller2_OldCS);
         }
 
-        // @TODO: fiugre out mesh representation
+        // @TODO: figure out mesh representation
 
         _Controller2_CurrentTrackedDevice.GetControllerTriggerState();
 
@@ -300,7 +300,7 @@ public class Devices
 
         }
 
-        // @TODO: fiugre out mesh representation
+        // @TODO: figure out mesh representation
 
         return new Dictionary<string, object>()
         {
@@ -362,7 +362,7 @@ public class Devices
             _Lighthouse2_OldPlane = CoordinateSystemToPlane(_Lighthouse2_OldCS);
         }
 
-        // @TODO: fiugre out mesh representation
+        // @TODO: figure out mesh representation
 
         return new Dictionary<string, object>()
         {
@@ -372,6 +372,76 @@ public class Devices
         };
     }
 
+
+
+    //  ████████╗██████╗  █████╗  ██████╗██╗  ██╗███████╗██████╗ 
+    //  ╚══██╔══╝██╔══██╗██╔══██╗██╔════╝██║ ██╔╝██╔════╝██╔══██╗
+    //     ██║   ██████╔╝███████║██║     █████╔╝ █████╗  ██████╔╝
+    //     ██║   ██╔══██╗██╔══██║██║     ██╔═██╗ ██╔══╝  ██╔══██╗
+    //     ██║   ██║  ██║██║  ██║╚██████╗██║  ██╗███████╗██║  ██║
+    //     ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝
+    //                                                           
+
+    private static VrTrackedDevice[] _GenericTracker_CurrentTrackedDevice = new VrTrackedDevice[8];
+    private static CoordinateSystem[] _GenericTracker_CurrentCS = new CoordinateSystem[8];
+    private static CoordinateSystem[] _GenericTracker_OldCS = new CoordinateSystem[8];
+    private static DSPlane[] _GenericTracker_OldPlane = new DSPlane[8];
+
+    /// <summary>
+    /// Tracking of HTC Vive Generic Tracker.
+    /// </summary>
+    /// <param name="Vive">The Vive object to read from.</param>
+    /// <param name="index">If more than one Tracker, choose index number.</param>
+    /// <param name="tracked">Should the device be tracked?</param>
+    /// <returns></returns>
+    [MultiReturn(new[] { "Mesh", "Plane", "CoordinateSystem" })]
+    public static Dictionary<string, object> GenericTracker(object Vive, int index = 0, bool tracked = true)
+    {
+        OpenvrWrapper wrapper;
+        try
+        {
+            wrapper = Vive as OpenvrWrapper;
+        }
+        catch
+        {
+            DynamoServices.LogWarningMessageEvents.OnLogWarningMessage("Please connect a Vive object to this node's input.");
+            return null;
+        }
+
+        var list = wrapper.TrackedDevices.IndexesByClasses["Tracker"];
+        if (list.Count < index + 1)
+        {
+            DynamoServices.LogWarningMessageEvents.OnLogWarningMessage("Cannot find Generic Tracker. Wrong index?");
+            return null;
+        }
+        
+        if (tracked)
+        {
+            int id = wrapper.TrackedDevices.IndexesByClasses["Tracker"][index];
+
+            _GenericTracker_CurrentTrackedDevice[index] = wrapper.TrackedDevices.AllDevices[id];
+            _GenericTracker_CurrentTrackedDevice[index].ConvertPose();
+            _GenericTracker_CurrentTrackedDevice[index].CorrectGenericTrackerMatrix();
+
+            _GenericTracker_CurrentCS[index] = CoordinateSystem.Identity();
+            using (CoordinateSystem cm = Matrix4x4ToCoordinateSystem(_GenericTracker_CurrentTrackedDevice[index].CorrectedMatrix4x4, false))
+            {
+                _GenericTracker_CurrentCS[index] = _GenericTracker_CurrentCS[index].Transform(cm);
+            }
+
+            _GenericTracker_OldCS[index] = _GenericTracker_CurrentCS[index];
+            _GenericTracker_OldPlane[index] = CoordinateSystemToPlane(_GenericTracker_OldCS[index]);
+        }
+
+        // @TODO: figure out mesh representation
+
+        return new Dictionary<string, object>()
+        {
+            { "Tracker", null },
+            { "Plane", _GenericTracker_OldPlane[index] },
+            { "CoordinateSystem", _GenericTracker_OldCS[index] }
+        };
+    }
 
 
 
