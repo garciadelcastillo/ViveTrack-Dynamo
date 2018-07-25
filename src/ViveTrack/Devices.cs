@@ -19,15 +19,29 @@ public class Devices
 {
     internal Devices() { }
 
+    
+    //  ██╗  ██╗███╗   ███╗██████╗ 
+    //  ██║  ██║████╗ ████║██╔══██╗
+    //  ███████║██╔████╔██║██║  ██║
+    //  ██╔══██║██║╚██╔╝██║██║  ██║
+    //  ██║  ██║██║ ╚═╝ ██║██████╔╝
+    //  ╚═╝  ╚═╝╚═╝     ╚═╝╚═════╝ 
+    //                             
+
     // Due to Zero Touch nature, these instances will be shared by all nodes... Not ideal, but good enough for 99% of situations.
     private static VrTrackedDevice _HMD_CurrentTrackedDevice;
     private static CoordinateSystem _HMD_CurrentCS;
     private static CoordinateSystem _HMD_OldCS;
     private static Autodesk.DesignScript.Geometry.Plane _HMD_OldPlane;
 
-
-    [MultiReturn(new[] { "Mesh", "Plane", "CoordinateSystem", "m44" })]
-    public static Dictionary<string, object> HMD(object Vive, bool read = true)
+    /// <summary>
+    /// Tracking of HTC Vive Head Mounted Display (HMD).
+    /// </summary>
+    /// <param name="Vive">The Vive object to read from.</param>
+    /// <param name="tracked">Should the HMD be tracked?</param>
+    /// <returns></returns>
+    [MultiReturn(new[] { "Mesh", "Plane", "CoordinateSystem" })]
+    public static Dictionary<string, object> HMD(object Vive, bool tracked = true)
     {
         OpenvrWrapper wrapper;
         try
@@ -48,7 +62,7 @@ public class Devices
         }
 
 
-        if (read)
+        if (tracked)
         {
             int index = wrapper.TrackedDevices.IndexesByClasses["HMD"][0];
 
@@ -66,19 +80,171 @@ public class Devices
 
         }
 
+        // @TODO: fiugre out mesh representation
+
         return new Dictionary<string, object>()
         {
             { "HMD", null },
             { "Plane", _HMD_OldPlane },
-            { "CoordinateSystem", _HMD_OldCS },
-            { "m44", _HMD_CurrentTrackedDevice.CorrectedMatrix4x4 }
+            { "CoordinateSystem", _HMD_OldCS }
         };
     }
 
 
 
-    
+    //   ██████╗ ██████╗ ███╗   ██╗████████╗██████╗  ██████╗ ██╗     ██╗     ███████╗██████╗ ███████╗
+    //  ██╔════╝██╔═══██╗████╗  ██║╚══██╔══╝██╔══██╗██╔═══██╗██║     ██║     ██╔════╝██╔══██╗██╔════╝
+    //  ██║     ██║   ██║██╔██╗ ██║   ██║   ██████╔╝██║   ██║██║     ██║     █████╗  ██████╔╝███████╗
+    //  ██║     ██║   ██║██║╚██╗██║   ██║   ██╔══██╗██║   ██║██║     ██║     ██╔══╝  ██╔══██╗╚════██║
+    //  ╚██████╗╚██████╔╝██║ ╚████║   ██║   ██║  ██║╚██████╔╝███████╗███████╗███████╗██║  ██║███████║
+    //   ╚═════╝ ╚═════╝ ╚═╝  ╚═══╝   ╚═╝   ╚═╝  ╚═╝ ╚═════╝ ╚══════╝╚══════╝╚══════╝╚═╝  ╚═╝╚══════╝
+    //                                                                                               
 
+    private static VrTrackedDevice _Controller1_CurrentTrackedDevice;
+    private static CoordinateSystem _Controller1_CurrentCS;
+    private static CoordinateSystem _Controller1_OldCS;
+    private static Autodesk.DesignScript.Geometry.Plane _Controller1_OldPlane;
+
+
+    [MultiReturn(new[] { "Mesh", "Plane", "CoordinateSystem", "TriggerPressed", "TriggerClicked", "TriggerValue", "TouchPadTouched", "TouchPadClicked", "TouchPadValueX", "TouchPadValueY" })]
+    public static Dictionary<string, object> Controller1(object Vive, bool tracked = true)
+    {
+        OpenvrWrapper wrapper;
+        try
+        {
+            wrapper = Vive as OpenvrWrapper;
+        }
+        catch
+        {
+            DynamoServices.LogWarningMessageEvents.OnLogWarningMessage("Please connect a Vive object to this node's input.");
+            return null;
+        }
+
+        var list = wrapper.TrackedDevices.IndexesByClasses["Controller"];
+        if (list.Count == 0)
+        {
+            DynamoServices.LogWarningMessageEvents.OnLogWarningMessage("No Controller detected.");
+            return null;
+        }
+        
+        if (tracked)
+        {
+            int index = wrapper.TrackedDevices.IndexesByClasses["Controller"][0];
+
+            _Controller1_CurrentTrackedDevice = wrapper.TrackedDevices.AllDevices[index];
+            _Controller1_CurrentTrackedDevice.ConvertPose();
+
+            _Controller1_CurrentCS = CoordinateSystem.Identity();
+            using (CoordinateSystem cm = Matrix4x4ToCoordinateSystem(_Controller1_CurrentTrackedDevice.CorrectedMatrix4x4, false))
+            {
+                _Controller1_CurrentCS = _Controller1_CurrentCS.Transform(cm);
+            }
+
+            _Controller1_OldCS = _Controller1_CurrentCS;
+            _Controller1_OldPlane = CoordinateSystemToPlane(_Controller1_OldCS);
+        }
+
+        // @TODO: fiugre out mesh representation
+
+        _Controller1_CurrentTrackedDevice.GetControllerTriggerState();
+
+        return new Dictionary<string, object>()
+        {
+            { "HMD", null },
+            { "Plane", _Controller1_OldPlane },
+            { "CoordinateSystem", _Controller1_OldCS },
+            { "TriggerPressed", _Controller1_CurrentTrackedDevice.TriggerPressed },
+            { "TriggerClicked", _Controller1_CurrentTrackedDevice.TriggerClicked },
+            { "TriggerValue", _Controller1_CurrentTrackedDevice.TriggerValue },
+            { "TouchPadTouched", _Controller1_CurrentTrackedDevice.TouchPadTouched },
+            { "TouchPadClicked", _Controller1_CurrentTrackedDevice.TouchPadClicked },
+            { "TouchPadValueX", _Controller1_CurrentTrackedDevice.TouchPadValueX },
+            { "TouchPadValueY", _Controller1_CurrentTrackedDevice.TouchPadValueY }
+        };
+    }
+
+
+
+    private static VrTrackedDevice _Controller2_CurrentTrackedDevice;
+    private static CoordinateSystem _Controller2_CurrentCS;
+    private static CoordinateSystem _Controller2_OldCS;
+    private static Autodesk.DesignScript.Geometry.Plane _Controller2_OldPlane;
+
+
+    [MultiReturn(new[] { "Mesh", "Plane", "CoordinateSystem", "TriggerPressed", "TriggerClicked", "TriggerValue", "TouchPadTouched", "TouchPadClicked", "TouchPadValueX", "TouchPadValueY" })]
+    public static Dictionary<string, object> Controller2(object Vive, bool tracked = true)
+    {
+        OpenvrWrapper wrapper;
+        try
+        {
+            wrapper = Vive as OpenvrWrapper;
+        }
+        catch
+        {
+            DynamoServices.LogWarningMessageEvents.OnLogWarningMessage("Please connect a Vive object to this node's input.");
+            return null;
+        }
+
+        var list = wrapper.TrackedDevices.IndexesByClasses["Controller"];
+        if (list.Count == 0)
+        {
+            DynamoServices.LogWarningMessageEvents.OnLogWarningMessage("No Controller detected.");
+            return null;
+        }
+
+        if (tracked)
+        {
+            int index = wrapper.TrackedDevices.IndexesByClasses["Controller"][1];
+
+            _Controller2_CurrentTrackedDevice = wrapper.TrackedDevices.AllDevices[index];
+            _Controller2_CurrentTrackedDevice.ConvertPose();
+
+            _Controller2_CurrentCS = CoordinateSystem.Identity();
+            using (CoordinateSystem cm = Matrix4x4ToCoordinateSystem(_Controller2_CurrentTrackedDevice.CorrectedMatrix4x4, false))
+            {
+                _Controller2_CurrentCS = _Controller2_CurrentCS.Transform(cm);
+            }
+
+            _Controller2_OldCS = _Controller2_CurrentCS;
+            _Controller2_OldPlane = CoordinateSystemToPlane(_Controller2_OldCS);
+        }
+
+        // @TODO: fiugre out mesh representation
+
+        _Controller2_CurrentTrackedDevice.GetControllerTriggerState();
+
+        return new Dictionary<string, object>()
+        {
+            { "HMD", null },
+            { "Plane", _Controller2_OldPlane },
+            { "CoordinateSystem", _Controller2_OldCS },
+            { "TriggerPressed", _Controller2_CurrentTrackedDevice.TriggerPressed },
+            { "TriggerClicked", _Controller2_CurrentTrackedDevice.TriggerClicked },
+            { "TriggerValue", _Controller2_CurrentTrackedDevice.TriggerValue },
+            { "TouchPadTouched", _Controller2_CurrentTrackedDevice.TouchPadTouched },
+            { "TouchPadClicked", _Controller2_CurrentTrackedDevice.TouchPadClicked },
+            { "TouchPadValueX", _Controller2_CurrentTrackedDevice.TouchPadValueX },
+            { "TouchPadValueY", _Controller2_CurrentTrackedDevice.TouchPadValueY }
+        };
+    }
+
+
+
+
+
+
+
+
+
+
+
+    //  ██╗   ██╗████████╗██╗██╗     ███████╗
+    //  ██║   ██║╚══██╔══╝██║██║     ██╔════╝
+    //  ██║   ██║   ██║   ██║██║     ███████╗
+    //  ██║   ██║   ██║   ██║██║     ╚════██║
+    //  ╚██████╔╝   ██║   ██║███████╗███████║
+    //   ╚═════╝    ╚═╝   ╚═╝╚══════╝╚══════╝
+    //                                       
 
     internal static DSPlane CoordinateSystemToPlane(CoordinateSystem cs)
     {
