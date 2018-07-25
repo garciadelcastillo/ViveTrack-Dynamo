@@ -38,7 +38,7 @@ public class Devices
     /// Tracking of HTC Vive Head Mounted Display (HMD).
     /// </summary>
     /// <param name="Vive">The Vive object to read from.</param>
-    /// <param name="tracked">Should the HMD be tracked?</param>
+    /// <param name="tracked">Should the device be tracked?</param>
     /// <returns></returns>
     [MultiReturn(new[] { "Mesh", "Plane", "CoordinateSystem" })]
     public static Dictionary<string, object> HMD(object Vive, bool tracked = true)
@@ -105,7 +105,12 @@ public class Devices
     private static CoordinateSystem _Controller1_OldCS;
     private static Autodesk.DesignScript.Geometry.Plane _Controller1_OldPlane;
 
-
+    /// <summary>
+    /// Tracking of HTC Vive Controller #1.
+    /// </summary>
+    /// <param name="Vive">The Vive object to read from.</param>
+    /// <param name="tracked">Should the device be tracked?</param>
+    /// <returns></returns>
     [MultiReturn(new[] { "Mesh", "Plane", "CoordinateSystem", "TriggerPressed", "TriggerClicked", "TriggerValue", "TouchPadTouched", "TouchPadClicked", "TouchPadValueX", "TouchPadValueY" })]
     public static Dictionary<string, object> Controller1(object Vive, bool tracked = true)
     {
@@ -150,7 +155,7 @@ public class Devices
 
         return new Dictionary<string, object>()
         {
-            { "HMD", null },
+            { "Controller1", null },
             { "Plane", _Controller1_OldPlane },
             { "CoordinateSystem", _Controller1_OldCS },
             { "TriggerPressed", _Controller1_CurrentTrackedDevice.TriggerPressed },
@@ -170,7 +175,12 @@ public class Devices
     private static CoordinateSystem _Controller2_OldCS;
     private static Autodesk.DesignScript.Geometry.Plane _Controller2_OldPlane;
 
-
+    /// <summary>
+    /// Tracking of HTC Vive Controller #2.
+    /// </summary>
+    /// <param name="Vive">The Vive object to read from.</param>
+    /// <param name="tracked">Should the device be tracked?</param>
+    /// <returns></returns>
     [MultiReturn(new[] { "Mesh", "Plane", "CoordinateSystem", "TriggerPressed", "TriggerClicked", "TriggerValue", "TouchPadTouched", "TouchPadClicked", "TouchPadValueX", "TouchPadValueY" })]
     public static Dictionary<string, object> Controller2(object Vive, bool tracked = true)
     {
@@ -186,7 +196,7 @@ public class Devices
         }
 
         var list = wrapper.TrackedDevices.IndexesByClasses["Controller"];
-        if (list.Count == 0)
+        if (list.Count < 2)
         {
             DynamoServices.LogWarningMessageEvents.OnLogWarningMessage("No Controller detected.");
             return null;
@@ -215,7 +225,7 @@ public class Devices
 
         return new Dictionary<string, object>()
         {
-            { "HMD", null },
+            { "Controller2", null },
             { "Plane", _Controller2_OldPlane },
             { "CoordinateSystem", _Controller2_OldCS },
             { "TriggerPressed", _Controller2_CurrentTrackedDevice.TriggerPressed },
@@ -230,6 +240,137 @@ public class Devices
 
 
 
+
+    //  ██╗     ██╗ ██████╗ ██╗  ██╗████████╗██╗  ██╗ ██████╗ ██╗   ██╗███████╗███████╗███████╗
+    //  ██║     ██║██╔════╝ ██║  ██║╚══██╔══╝██║  ██║██╔═══██╗██║   ██║██╔════╝██╔════╝██╔════╝
+    //  ██║     ██║██║  ███╗███████║   ██║   ███████║██║   ██║██║   ██║███████╗█████╗  ███████╗
+    //  ██║     ██║██║   ██║██╔══██║   ██║   ██╔══██║██║   ██║██║   ██║╚════██║██╔══╝  ╚════██║
+    //  ███████╗██║╚██████╔╝██║  ██║   ██║   ██║  ██║╚██████╔╝╚██████╔╝███████║███████╗███████║
+    //  ╚══════╝╚═╝ ╚═════╝ ╚═╝  ╚═╝   ╚═╝   ╚═╝  ╚═╝ ╚═════╝  ╚═════╝ ╚══════╝╚══════╝╚══════╝
+    //                                                                                         
+
+    private static VrTrackedDevice _Lighthouse1_CurrentTrackedDevice;
+    private static CoordinateSystem _Lighthouse1_CurrentCS;
+    private static CoordinateSystem _Lighthouse1_OldCS;
+    private static Autodesk.DesignScript.Geometry.Plane _Lighthouse1_OldPlane;
+
+    /// <summary>
+    /// Tracking of HTC Vive Lighthouse #1.
+    /// </summary>
+    /// <param name="Vive">The Vive object to read from.</param>
+    /// <param name="tracked">Should the device be tracked?</param>
+    /// <returns></returns>
+    [MultiReturn(new[] { "Mesh", "Plane", "CoordinateSystem" })]
+    public static Dictionary<string, object> Lighthouse1(object Vive, bool tracked = true)
+    {
+        OpenvrWrapper wrapper;
+        try
+        {
+            wrapper = Vive as OpenvrWrapper;
+        }
+        catch
+        {
+            DynamoServices.LogWarningMessageEvents.OnLogWarningMessage("Please connect a Vive object to this node's input.");
+            return null;
+        }
+
+        var list = wrapper.TrackedDevices.IndexesByClasses["Lighthouse"];
+        if (list.Count == 0)
+        {
+            DynamoServices.LogWarningMessageEvents.OnLogWarningMessage("No Lighthouse detected.");
+            return null;
+        }
+
+
+        if (tracked)
+        {
+            int index = wrapper.TrackedDevices.IndexesByClasses["Lighthouse"][0];
+
+            _Lighthouse1_CurrentTrackedDevice = wrapper.TrackedDevices.AllDevices[index];
+            _Lighthouse1_CurrentTrackedDevice.ConvertPose();
+
+            _Lighthouse1_CurrentCS = CoordinateSystem.Identity();
+            using (CoordinateSystem cm = Matrix4x4ToCoordinateSystem(_Lighthouse1_CurrentTrackedDevice.CorrectedMatrix4x4, false))
+            {
+                _Lighthouse1_CurrentCS = _Lighthouse1_CurrentCS.Transform(cm);
+            }
+
+            _Lighthouse1_OldCS = _Lighthouse1_CurrentCS;
+            _Lighthouse1_OldPlane = CoordinateSystemToPlane(_Lighthouse1_OldCS);
+
+        }
+
+        // @TODO: fiugre out mesh representation
+
+        return new Dictionary<string, object>()
+        {
+            { "Lighthouse1", null },
+            { "Plane", _Lighthouse1_OldPlane },
+            { "CoordinateSystem", _Lighthouse1_OldCS }
+        };
+    }
+
+
+
+    private static VrTrackedDevice _Lighthouse2_CurrentTrackedDevice;
+    private static CoordinateSystem _Lighthouse2_CurrentCS;
+    private static CoordinateSystem _Lighthouse2_OldCS;
+    private static Autodesk.DesignScript.Geometry.Plane _Lighthouse2_OldPlane;
+
+    /// <summary>
+    /// Tracking of HTC Vive Lighthouse #2.
+    /// </summary>
+    /// <param name="Vive">The Vive object to read from.</param>
+    /// <param name="tracked">Should the device be tracked?</param>
+    /// <returns></returns>
+    [MultiReturn(new[] { "Mesh", "Plane", "CoordinateSystem" })]
+    public static Dictionary<string, object> Lighthouse2(object Vive, bool tracked = true)
+    {
+        OpenvrWrapper wrapper;
+        try
+        {
+            wrapper = Vive as OpenvrWrapper;
+        }
+        catch
+        {
+            DynamoServices.LogWarningMessageEvents.OnLogWarningMessage("Please connect a Vive object to this node's input.");
+            return null;
+        }
+
+        var list = wrapper.TrackedDevices.IndexesByClasses["Lighthouse"];
+        if (list.Count < 2)
+        {
+            DynamoServices.LogWarningMessageEvents.OnLogWarningMessage("No Lighthouse detected.");
+            return null;
+        }
+
+
+        if (tracked)
+        {
+            int index = wrapper.TrackedDevices.IndexesByClasses["Lighthouse"][1];
+
+            _Lighthouse2_CurrentTrackedDevice = wrapper.TrackedDevices.AllDevices[index];
+            _Lighthouse2_CurrentTrackedDevice.ConvertPose();
+
+            _Lighthouse2_CurrentCS = CoordinateSystem.Identity();
+            using (CoordinateSystem cm = Matrix4x4ToCoordinateSystem(_Lighthouse2_CurrentTrackedDevice.CorrectedMatrix4x4, false))
+            {
+                _Lighthouse2_CurrentCS = _Lighthouse2_CurrentCS.Transform(cm);
+            }
+
+            _Lighthouse2_OldCS = _Lighthouse2_CurrentCS;
+            _Lighthouse2_OldPlane = CoordinateSystemToPlane(_Lighthouse2_OldCS);
+        }
+
+        // @TODO: fiugre out mesh representation
+
+        return new Dictionary<string, object>()
+        {
+            { "Lighthouse2", null },
+            { "Plane", _Lighthouse2_OldPlane },
+            { "CoordinateSystem", _Lighthouse2_OldCS }
+        };
+    }
 
 
 
