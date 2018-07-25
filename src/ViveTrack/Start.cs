@@ -30,7 +30,8 @@ public class Start
     /// Start HTC Vive. Make sure SteamVR is running, and Dynamo is set to Periodic update.
     /// </summary>
     /// <param name="Connect">Connect to SteamVR?</param>
-    /// <returns></returns>
+    /// <returns name = "Msg">Summary of the VR setting.</returns>
+    /// <returns name = "Vive">The main Vive object.</returns>
     [CanUpdatePeriodically(true)]
     [MultiReturn(new[] { "Msg", "Vive" })]
     public static Dictionary<string, object> ConnectToVive(bool Connect = true)

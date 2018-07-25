@@ -32,14 +32,16 @@ public class Devices
     private static VrTrackedDevice _HMD_CurrentTrackedDevice;
     private static CoordinateSystem _HMD_CurrentCS;
     private static CoordinateSystem _HMD_OldCS;
-    private static Autodesk.DesignScript.Geometry.Plane _HMD_OldPlane;
+    private static DSPlane _HMD_OldPlane;
 
     /// <summary>
     /// Tracking of HTC Vive Head Mounted Display (HMD).
     /// </summary>
     /// <param name="Vive">The Vive object to read from.</param>
     /// <param name="tracked">Should the device be tracked?</param>
-    /// <returns></returns>
+    /// <returns name = "Mesh">Mesh representation of the device.</returns>
+    /// <returns name = "Plane">The device's Plane.</returns>
+    /// <returns name = "CoordinateSystem">The device's CoordinateSystem.</returns>
     [MultiReturn(new[] { "Mesh", "Plane", "CoordinateSystem" })]
     public static Dictionary<string, object> HMD(object Vive, bool tracked = true)
     {
@@ -84,7 +86,7 @@ public class Devices
 
         return new Dictionary<string, object>()
         {
-            { "HMD", null },
+            { "Mesh", null },
             { "Plane", _HMD_OldPlane },
             { "CoordinateSystem", _HMD_OldCS }
         };
@@ -103,14 +105,23 @@ public class Devices
     private static VrTrackedDevice _Controller1_CurrentTrackedDevice;
     private static CoordinateSystem _Controller1_CurrentCS;
     private static CoordinateSystem _Controller1_OldCS;
-    private static Autodesk.DesignScript.Geometry.Plane _Controller1_OldPlane;
+    private static DSPlane _Controller1_OldPlane;
 
     /// <summary>
     /// Tracking of HTC Vive Controller #1.
     /// </summary>
     /// <param name="Vive">The Vive object to read from.</param>
     /// <param name="tracked">Should the device be tracked?</param>
-    /// <returns></returns>
+    /// <returns name = "Mesh">Mesh representation of the device.</returns>
+    /// <returns name = "Plane">The device's Plane.</returns>
+    /// <returns name = "CoordinateSystem">The device's CoordinateSystem.</returns>
+    /// <returns name = "TriggerPressed">Is the trigger pressed?</returns>
+    /// <returns name = "TriggerClicked">Is the trigger clicked (pressed all the way in)?</returns>
+    /// <returns name = "TriggerValue">Trigger level from 0 (not pressed) to 1 (fully pressed).</returns>
+    /// <returns name = "TouchPadTouched">Is the touchpad being touched?</returns>
+    /// <returns name = "TouchPadClicked">Is the touchpad being clicked (pressed all the way in)?</returns>
+    /// <returns name = "TouchPadValueX">Touch value from -1 (left) to 1 (right).</returns>
+    /// <returns name = "TouchPadValueY">Touch value from -1 (bottom) to 1 (top).</returns>
     [MultiReturn(new[] { "Mesh", "Plane", "CoordinateSystem", "TriggerPressed", "TriggerClicked", "TriggerValue", "TouchPadTouched", "TouchPadClicked", "TouchPadValueX", "TouchPadValueY" })]
     public static Dictionary<string, object> Controller1(object Vive, bool tracked = true)
     {
@@ -155,7 +166,7 @@ public class Devices
 
         return new Dictionary<string, object>()
         {
-            { "Controller1", null },
+            { "Mesh", null },
             { "Plane", _Controller1_OldPlane },
             { "CoordinateSystem", _Controller1_OldCS },
             { "TriggerPressed", _Controller1_CurrentTrackedDevice.TriggerPressed },
@@ -173,14 +184,23 @@ public class Devices
     private static VrTrackedDevice _Controller2_CurrentTrackedDevice;
     private static CoordinateSystem _Controller2_CurrentCS;
     private static CoordinateSystem _Controller2_OldCS;
-    private static Autodesk.DesignScript.Geometry.Plane _Controller2_OldPlane;
+    private static DSPlane _Controller2_OldPlane;
 
     /// <summary>
     /// Tracking of HTC Vive Controller #2.
     /// </summary>
     /// <param name="Vive">The Vive object to read from.</param>
     /// <param name="tracked">Should the device be tracked?</param>
-    /// <returns></returns>
+    /// <returns name = "Mesh">Mesh representation of the device.</returns>
+    /// <returns name = "Plane">The device's Plane.</returns>
+    /// <returns name = "CoordinateSystem">The device's CoordinateSystem.</returns>
+    /// <returns name = "TriggerPressed">Is the trigger pressed?</returns>
+    /// <returns name = "TriggerClicked">Is the trigger clicked (pressed all the way in)?</returns>
+    /// <returns name = "TriggerValue">Trigger level from 0 (not pressed) to 1 (fully pressed).</returns>
+    /// <returns name = "TouchPadTouched">Is the touchpad being touched?</returns>
+    /// <returns name = "TouchPadClicked">Is the touchpad being clicked (pressed all the way in)?</returns>
+    /// <returns name = "TouchPadValueX">Touch value from -1 (left) to 1 (right).</returns>
+    /// <returns name = "TouchPadValueY">Touch value from -1 (bottom) to 1 (top).</returns>
     [MultiReturn(new[] { "Mesh", "Plane", "CoordinateSystem", "TriggerPressed", "TriggerClicked", "TriggerValue", "TouchPadTouched", "TouchPadClicked", "TouchPadValueX", "TouchPadValueY" })]
     public static Dictionary<string, object> Controller2(object Vive, bool tracked = true)
     {
@@ -225,7 +245,7 @@ public class Devices
 
         return new Dictionary<string, object>()
         {
-            { "Controller2", null },
+            { "Mesh", null },
             { "Plane", _Controller2_OldPlane },
             { "CoordinateSystem", _Controller2_OldCS },
             { "TriggerPressed", _Controller2_CurrentTrackedDevice.TriggerPressed },
@@ -252,14 +272,16 @@ public class Devices
     private static VrTrackedDevice _Lighthouse1_CurrentTrackedDevice;
     private static CoordinateSystem _Lighthouse1_CurrentCS;
     private static CoordinateSystem _Lighthouse1_OldCS;
-    private static Autodesk.DesignScript.Geometry.Plane _Lighthouse1_OldPlane;
+    private static DSPlane _Lighthouse1_OldPlane;
 
     /// <summary>
     /// Tracking of HTC Vive Lighthouse #1.
     /// </summary>
     /// <param name="Vive">The Vive object to read from.</param>
     /// <param name="tracked">Should the device be tracked?</param>
-    /// <returns></returns>
+    /// <returns name = "Mesh">Mesh representation of the device.</returns>
+    /// <returns name = "Plane">The device's Plane.</returns>
+    /// <returns name = "CoordinateSystem">The device's CoordinateSystem.</returns>
     [MultiReturn(new[] { "Mesh", "Plane", "CoordinateSystem" })]
     public static Dictionary<string, object> Lighthouse1(object Vive, bool tracked = true)
     {
@@ -304,7 +326,7 @@ public class Devices
 
         return new Dictionary<string, object>()
         {
-            { "Lighthouse1", null },
+            { "Mesh", null },
             { "Plane", _Lighthouse1_OldPlane },
             { "CoordinateSystem", _Lighthouse1_OldCS }
         };
@@ -315,14 +337,16 @@ public class Devices
     private static VrTrackedDevice _Lighthouse2_CurrentTrackedDevice;
     private static CoordinateSystem _Lighthouse2_CurrentCS;
     private static CoordinateSystem _Lighthouse2_OldCS;
-    private static Autodesk.DesignScript.Geometry.Plane _Lighthouse2_OldPlane;
+    private static DSPlane _Lighthouse2_OldPlane;
 
     /// <summary>
     /// Tracking of HTC Vive Lighthouse #2.
     /// </summary>
     /// <param name="Vive">The Vive object to read from.</param>
     /// <param name="tracked">Should the device be tracked?</param>
-    /// <returns></returns>
+    /// <returns name = "Mesh">Mesh representation of the device.</returns>
+    /// <returns name = "Plane">The device's Plane.</returns>
+    /// <returns name = "CoordinateSystem">The device's CoordinateSystem.</returns>
     [MultiReturn(new[] { "Mesh", "Plane", "CoordinateSystem" })]
     public static Dictionary<string, object> Lighthouse2(object Vive, bool tracked = true)
     {
@@ -366,7 +390,7 @@ public class Devices
 
         return new Dictionary<string, object>()
         {
-            { "Lighthouse2", null },
+            { "Mesh", null },
             { "Plane", _Lighthouse2_OldPlane },
             { "CoordinateSystem", _Lighthouse2_OldCS }
         };
@@ -393,7 +417,9 @@ public class Devices
     /// <param name="Vive">The Vive object to read from.</param>
     /// <param name="index">If more than one Tracker, choose index number.</param>
     /// <param name="tracked">Should the device be tracked?</param>
-    /// <returns></returns>
+    /// <returns name = "Mesh">Mesh representation of the device.</returns>
+    /// <returns name = "Plane">The device's Plane.</returns>
+    /// <returns name = "CoordinateSystem">The device's CoordinateSystem.</returns>
     [MultiReturn(new[] { "Mesh", "Plane", "CoordinateSystem" })]
     public static Dictionary<string, object> GenericTracker(object Vive, int index = 0, bool tracked = true)
     {
@@ -437,7 +463,7 @@ public class Devices
 
         return new Dictionary<string, object>()
         {
-            { "Tracker", null },
+            { "Mesh", null },
             { "Plane", _GenericTracker_OldPlane[index] },
             { "CoordinateSystem", _GenericTracker_OldCS[index] }
         };
