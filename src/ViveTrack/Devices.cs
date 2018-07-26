@@ -15,11 +15,189 @@ using ViveTrack;
 
 using DSPlane = Autodesk.DesignScript.Geometry.Plane;
 
+
+/// <summary>
+/// An object which knows how to draw itself in the background preview and uses a transform to take 
+/// advantage of the GPU to alter that background visualization. The original geometry remains unaltered,
+/// only the visualization is transformed.
+/// </summary>
+public class TransformableExample : IGraphicItem
+{
+    public Geometry Geometry { get; private set; }
+    private CoordinateSystem transform { get; set; }
+
+    //want to hide this constructor
+    [Autodesk.DesignScript.Runtime.IsVisibleInDynamoLibrary(false)]
+    public TransformableExample(Geometry geometry)
+    {
+        Geometry = geometry;
+        //initial transform is just at the origin
+        transform = CoordinateSystem.ByOrigin(0, 0, 0);
+    }
+
+    /// <summary>
+    /// Create a TranformableExample class which stores a Geometry object and a Transform.
+    /// </summary>
+    /// <param name="geometry"> a geometry object</param>
+    /// <returns></returns>
+    public static TransformableExample ByGeometry(Autodesk.DesignScript.Geometry.Geometry geometry)
+    {
+        var newTransformableThing = new TransformableExample(geometry);
+        return newTransformableThing;
+    }
+
+    /// <summary>
+    /// This method sets the transform on the object and returns a reference to the object so
+    /// the tessellate method is called and the new visualization shows in the background preview.
+    /// </summary>
+    /// <param name="transform"></param>
+    /// <returns></returns>
+    public TransformableExample TransformObject(CoordinateSystem transform)
+    {
+        this.transform = transform;
+        return this;
+    }
+
+    /// <summary>
+    /// This method is actually called by Dynamo when it attempts to render the TransformableExample. 
+    /// class.
+    /// </summary>
+    /// <param name="package"></param>
+    /// <param name="parameters"></param>
+    //hide this method from search
+    [Autodesk.DesignScript.Runtime.IsVisibleInDynamoLibrary(false)]
+
+    public void Tessellate(IRenderPackage package, TessellationParameters parameters)
+    {
+        //could increase performance further by cacheing this tesselation
+        Geometry.Tessellate(package, parameters);
+
+        //we use reflection here because this API was added in Dynamo 1.1 and might not exist for a user in Dynamo 1.0
+        //if you do not care about ensuring comptability of your zero touch node with 1.0 you can just call SetTransform directly
+        //by casting the rendering package to ITransformable.
+
+        //look for the method SetTransform with the double[] argument list.
+        var method = package.GetType().
+        GetMethod("SetTransform", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance,
+                null,
+                new[] { typeof(double[]) }, null);
+
+        //if the method exists call it using our current transform.
+        if (method != null)
+        {
+            method.Invoke(package, new object[] { new double[]
+        {transform.XAxis.X,transform.XAxis.Y,transform.XAxis.Z,0,
+        transform.YAxis.X,transform.YAxis.Y,transform.YAxis.Z,0,
+        transform.ZAxis.X,transform.ZAxis.Y,transform.ZAxis.Z,0,
+        transform.Origin.X,transform.Origin.Y,transform.Origin.Z,1
+        }});
+        }
+
+    }
+
+}
+
+public class HMDMesh : IGraphicItem
+{
+    #region MESHDATA
+    private readonly float[] vertices = new float[] {
+        0, 0.22f, 0,
+        0.1f, 0.22f, 0,
+        0.1f, -0.06f, 0,
+        0, -0.13f, 0,
+        -0.1f, -0.06f, 0,
+        -0.1f, 0.20f, 0
+    };
+
+    private readonly float[] normals = new float[]
+    {
+        0,0,1,
+        0,0,1,
+        0,0,1,
+        0,0,1,
+        0,0,1,
+        0,0,1
+    };
+
+    private readonly uint[] faces = new uint[]
+    {
+        0,2,1,
+        0,3,2,
+        0,4,3,
+        0,5,4
+    };
+    #endregion
+
+    private float[] verticesTrans;
+    private float[] normalTrans;
+    bool applyTransform = false;
+    private Matrix4x4 _transform;
+
+    internal HMDMesh()
+    {
+        verticesTrans = new float[vertices.Length];
+        normalTrans = new float[normals.Length];
+    }
+
+    private void PushTriangleVertex(IRenderPackage package, Point p, Vector n)
+    {
+        package.AddTriangleVertex(p.X, p.Y, p.Z);
+        package.AddTriangleVertexColor(255, 255, 255, 255);
+        package.AddTriangleVertexNormal(n.X, n.Y, n.Z);
+        package.AddTriangleVertexUV(0, 0);
+    }
+
+    internal void Transform(CoordinateSystem cs)
+    {
+        _transform = Util.CoordinateSystemToMatrix4x4(cs);
+
+        Vector3 v = new Vector3();
+        Vector3 n = new Vector3();
+
+        for (int i = 0; i < vertices.Length; i += 3)
+        {
+            v.X = vertices[i];
+            v.Y = vertices[i + 1];
+            v.Z = vertices[i + 2];
+
+            n.X = normals[i];
+            n.Y = normals[i + 1];
+            n.Z = normals[i + 2];
+
+            v = Vector3.Transform(v, _transform);
+            n = Vector3.Transform(n, _transform);
+
+            verticesTrans[i] = v.X;
+            verticesTrans[i + 1] = v.Y;
+            verticesTrans[i + 2] = v.Z;
+
+            normalTrans[i] = n.X;
+            normalTrans[i + 1] = n.Y;
+            normalTrans[i + 2] = n.Z;
+        }
+    }
+
+    
+    void IGraphicItem.Tessellate(IRenderPackage package, TessellationParameters parameters)
+    {
+        uint fid;
+        for (int i = 0; i < faces.Length; i++)
+        {
+            fid = 3 * faces[i];
+            package.AddTriangleVertex(verticesTrans[fid], verticesTrans[fid + 1], verticesTrans[fid + 2]);
+            package.AddTriangleVertexColor(255, 0, 0, 255);
+            package.AddTriangleVertexNormal(normalTrans[fid], normalTrans[fid + 1], normalTrans[fid + 2]);
+            package.AddTriangleVertexUV(0, 0);
+        }
+    }
+}
+
+
 public class Devices
 {
     internal Devices() { }
 
-    
+
     //  ██╗  ██╗███╗   ███╗██████╗ 
     //  ██║  ██║████╗ ████║██╔══██╗
     //  ███████║██╔████╔██║██║  ██║
@@ -33,6 +211,7 @@ public class Devices
     private static CoordinateSystem _HMD_CurrentCS;
     private static CoordinateSystem _HMD_OldCS;
     private static DSPlane _HMD_OldPlane;
+    private static HMDMesh _HMD_Mesh = new HMDMesh();
 
     /// <summary>
     /// Tracking of HTC Vive Head Mounted Display (HMD).
@@ -80,13 +259,15 @@ public class Devices
             _HMD_OldCS = _HMD_CurrentCS;
             _HMD_OldPlane = CoordinateSystemToPlane(_HMD_OldCS);
 
+            _HMD_Mesh.Transform(_HMD_OldCS);
+
         }
 
         // @TODO: figure out mesh representation
 
         return new Dictionary<string, object>()
         {
-            { "Mesh", null },
+            { "Mesh", _HMD_Mesh },
             { "Plane", _HMD_OldPlane },
             { "CoordinateSystem", _HMD_OldCS }
         };
@@ -142,7 +323,7 @@ public class Devices
             DynamoServices.LogWarningMessageEvents.OnLogWarningMessage("No Controller detected.");
             return null;
         }
-        
+
         if (tracked)
         {
             int index = wrapper.TrackedDevices.IndexesByClasses["Controller"][0];
@@ -440,7 +621,7 @@ public class Devices
             DynamoServices.LogWarningMessageEvents.OnLogWarningMessage("Cannot find Generic Tracker. Wrong index?");
             return null;
         }
-        
+
         if (tracked)
         {
             int id = wrapper.TrackedDevices.IndexesByClasses["Tracker"][index];
@@ -546,5 +727,5 @@ public class Devices
         }
         return a;
     }
-    
+
 }

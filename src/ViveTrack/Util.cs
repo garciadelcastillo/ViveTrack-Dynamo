@@ -48,6 +48,16 @@ static class Util
         return m;
     }
 
+    internal static Matrix4x4 CoordinateSystemToMatrix4x4(CoordinateSystem cs)
+    {
+        Matrix4x4 m = new Matrix4x4(
+            (float)cs.XAxis.X, (float)cs.XAxis.Y, (float)cs.XAxis.Z, 0f,
+            (float)cs.YAxis.X, (float)cs.YAxis.Y, (float)cs.YAxis.Z, 0f,
+            (float)cs.ZAxis.X, (float)cs.ZAxis.Y, (float)cs.ZAxis.Z, 0f,
+            (float)cs.Origin.X, (float)cs.Origin.Y, (float)cs.Origin.Z, 0f);
+        return m;
+    }
+
     internal static double[] Matrix4x4ToDoubleArray(Matrix4x4 m, bool transpose)
     {
         double[] a;
