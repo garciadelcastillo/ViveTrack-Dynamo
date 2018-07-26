@@ -127,6 +127,8 @@
     <Compile Include="openvr_api.cs" />
     <Compile Include="libs\VrTrackedDevice.cs" />
     <Compile Include="libs\VrTrackedDevices.cs" />
+    <Compile Include="PreviewMeshes\PreviewableHMD.cs" />
+    <Compile Include="PreviewMeshes\PreviewableMesh.cs" />
     <Compile Include="Start.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Util.cs" />

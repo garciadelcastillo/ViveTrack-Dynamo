@@ -97,100 +97,8 @@ public class TransformableExample : IGraphicItem
 
 }
 
-public class HMDMesh : IGraphicItem
-{
-    #region MESHDATA
-    private readonly float[] vertices = new float[] {
-        0, 0.22f, 0,
-        0.1f, 0.22f, 0,
-        0.1f, -0.06f, 0,
-        0, -0.13f, 0,
-        -0.1f, -0.06f, 0,
-        -0.1f, 0.20f, 0
-    };
 
-    private readonly float[] normals = new float[]
-    {
-        0,0,1,
-        0,0,1,
-        0,0,1,
-        0,0,1,
-        0,0,1,
-        0,0,1
-    };
 
-    private readonly uint[] faces = new uint[]
-    {
-        0,2,1,
-        0,3,2,
-        0,4,3,
-        0,5,4
-    };
-    #endregion
-
-    private float[] verticesTrans;
-    private float[] normalTrans;
-    bool applyTransform = false;
-    private Matrix4x4 _transform;
-
-    internal HMDMesh()
-    {
-        verticesTrans = new float[vertices.Length];
-        normalTrans = new float[normals.Length];
-    }
-
-    private void PushTriangleVertex(IRenderPackage package, Point p, Vector n)
-    {
-        package.AddTriangleVertex(p.X, p.Y, p.Z);
-        package.AddTriangleVertexColor(255, 255, 255, 255);
-        package.AddTriangleVertexNormal(n.X, n.Y, n.Z);
-        package.AddTriangleVertexUV(0, 0);
-    }
-
-    internal void Transform(CoordinateSystem cs)
-    {
-        _transform = Util.CoordinateSystemToMatrix4x4(cs);
-
-        Vector3 v = new Vector3();
-        Vector3 n = new Vector3();
-
-        for (int i = 0; i < vertices.Length; i += 3)
-        {
-            v.X = vertices[i];
-            v.Y = vertices[i + 1];
-            v.Z = vertices[i + 2];
-
-            n.X = normals[i];
-            n.Y = normals[i + 1];
-            n.Z = normals[i + 2];
-
-            v = Vector3.Transform(v, _transform);
-            n = Vector3.Transform(n, _transform);
-
-            verticesTrans[i] = v.X;
-            verticesTrans[i + 1] = v.Y;
-            verticesTrans[i + 2] = v.Z;
-
-            normalTrans[i] = n.X;
-            normalTrans[i + 1] = n.Y;
-            normalTrans[i + 2] = n.Z;
-        }
-    }
-
-    
-    void IGraphicItem.Tessellate(IRenderPackage package, TessellationParameters parameters)
-    {
-        uint fid;
-        for (int i = 0; i < faces.Length; i++)
-        {
-            fid = 3 * faces[i];
-            package.AddTriangleVertex(verticesTrans[fid], verticesTrans[fid + 1], verticesTrans[fid + 2]);
-            package.AddTriangleVertexColor(255, 0, 0, 255);
-            package.AddTriangleVertexNormal(normalTrans[fid], normalTrans[fid + 1], normalTrans[fid + 2]);
-            package.AddTriangleVertexUV(0, 0);
-        }
-    }
-}
 
 
 public class Devices
@@ -211,18 +119,19 @@ public class Devices
     private static CoordinateSystem _HMD_CurrentCS;
     private static CoordinateSystem _HMD_OldCS;
     private static DSPlane _HMD_OldPlane;
-    private static HMDMesh _HMD_Mesh = new HMDMesh();
+    private static PreviewableHMD _HMD_Mesh = new PreviewableHMD();
 
     /// <summary>
     /// Tracking of HTC Vive Head Mounted Display (HMD).
     /// </summary>
     /// <param name="Vive">The Vive object to read from.</param>
     /// <param name="tracked">Should the device be tracked?</param>
+    /// <param name="previewMesh">Render a preview mesh of the device? Will slow things down...</param>
     /// <returns name = "Mesh">Mesh representation of the device.</returns>
     /// <returns name = "Plane">The device's Plane.</returns>
     /// <returns name = "CoordinateSystem">The device's CoordinateSystem.</returns>
     [MultiReturn(new[] { "Mesh", "Plane", "CoordinateSystem" })]
-    public static Dictionary<string, object> HMD(object Vive, bool tracked = true)
+    public static Dictionary<string, object> HMD(object Vive, bool tracked = true, bool previewMesh = true)
     {
         OpenvrWrapper wrapper;
         try
@@ -259,6 +168,7 @@ public class Devices
             _HMD_OldCS = _HMD_CurrentCS;
             _HMD_OldPlane = CoordinateSystemToPlane(_HMD_OldCS);
 
+            _HMD_Mesh.Preview(previewMesh);
             _HMD_Mesh.Transform(_HMD_OldCS);
 
         }
