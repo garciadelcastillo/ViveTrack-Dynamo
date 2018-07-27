@@ -112,24 +112,25 @@ public class Devices
 
 
 
-    //   ██████╗ ██████╗ ███╗   ██╗████████╗██████╗  ██████╗ ██╗     ██╗     ███████╗██████╗ ███████╗
-    //  ██╔════╝██╔═══██╗████╗  ██║╚══██╔══╝██╔══██╗██╔═══██╗██║     ██║     ██╔════╝██╔══██╗██╔════╝
-    //  ██║     ██║   ██║██╔██╗ ██║   ██║   ██████╔╝██║   ██║██║     ██║     █████╗  ██████╔╝███████╗
-    //  ██║     ██║   ██║██║╚██╗██║   ██║   ██╔══██╗██║   ██║██║     ██║     ██╔══╝  ██╔══██╗╚════██║
-    //  ╚██████╗╚██████╔╝██║ ╚████║   ██║   ██║  ██║╚██████╔╝███████╗███████╗███████╗██║  ██║███████║
-    //   ╚═════╝ ╚═════╝ ╚═╝  ╚═══╝   ╚═╝   ╚═╝  ╚═╝ ╚═════╝ ╚══════╝╚══════╝╚══════╝╚═╝  ╚═╝╚══════╝
-    //                                                                                               
 
-    private static VrTrackedDevice _Controller1_CurrentTrackedDevice;
-    private static CoordinateSystem _Controller1_CurrentCS;
-    private static CoordinateSystem _Controller1_OldCS;
-    private static PreviewableController _Controller1_Mesh = new PreviewableController();
-    private static Color _Controller1_MeshDefaultColor = Color.ByARGB(255, 142, 242, 109);
+    //   ██████╗ ██████╗ ███╗   ██╗████████╗██████╗  ██████╗ ██╗     ██╗     ███████╗██████╗ 
+    //  ██╔════╝██╔═══██╗████╗  ██║╚══██╔══╝██╔══██╗██╔═══██╗██║     ██║     ██╔════╝██╔══██╗
+    //  ██║     ██║   ██║██╔██╗ ██║   ██║   ██████╔╝██║   ██║██║     ██║     █████╗  ██████╔╝
+    //  ██║     ██║   ██║██║╚██╗██║   ██║   ██╔══██╗██║   ██║██║     ██║     ██╔══╝  ██╔══██╗
+    //  ╚██████╗╚██████╔╝██║ ╚████║   ██║   ██║  ██║╚██████╔╝███████╗███████╗███████╗██║  ██║
+    //   ╚═════╝ ╚═════╝ ╚═╝  ╚═══╝   ╚═╝   ╚═╝  ╚═╝ ╚═════╝ ╚══════╝╚══════╝╚══════╝╚═╝  ╚═╝
+
+    private static VrTrackedDevice[] _Controller_CurrentTrackedDevice = new VrTrackedDevice[8];
+    private static CoordinateSystem[] _Controller_CurrentCS = new CoordinateSystem[8];
+    private static CoordinateSystem[] _Controller_OldCS = new CoordinateSystem[8];
+    private static PreviewableController[] _Controller_Mesh = new PreviewableController[8];
+    private static Color _Controller_MeshDefaultColor = Color.ByARGB(255, 142, 242, 109);
 
     /// <summary>
-    /// Tracking of HTC Vive Controller #1.
+    /// Tracking of HTC Vive Controllers.
     /// </summary>
     /// <param name="Vive">The Vive object to read from.</param>
+    /// <param name="index">If more than one Tracker, choose index number.</param>
     /// <param name="tracked">Should the device be tracked?</param>
     /// <param name="previewMesh">Render a preview mesh of the device? Will slow things down...</param>
     /// <returns name = "Mesh">Mesh representation of the device.</returns>
@@ -142,7 +143,8 @@ public class Devices
     /// <returns name = "TouchPadValueX">Touch value from -1 (left) to 1 (right).</returns>
     /// <returns name = "TouchPadValueY">Touch value from -1 (bottom) to 1 (top).</returns>
     [MultiReturn(new[] { "Mesh", "CoordinateSystem", "TriggerPressed", "TriggerClicked", "TriggerValue", "TouchPadTouched", "TouchPadClicked", "TouchPadValueX", "TouchPadValueY" })]
-    public static Dictionary<string, object> Controller1(object Vive,
+    public static Dictionary<string, object> Controller(object Vive,
+        [DefaultArgumentAttribute("0")]int index,
         [DefaultArgumentAttribute("true")]bool tracked,
         [DefaultArgumentAttribute("true")]bool previewMesh,
         [DefaultArgumentAttribute("Color.ByARGB(255, 142, 242, 109)")]Color previewColor)
@@ -159,148 +161,64 @@ public class Devices
         }
 
         var list = wrapper.TrackedDevices.IndexesByClasses["Controller"];
-        if (list.Count == 0)
+        if (list.Count < index + 1)
         {
             DynamoServices.LogWarningMessageEvents.OnLogWarningMessage("No Controller detected.");
             return null;
         }
 
-        _Controller1_Mesh.Preview(previewMesh);
+        if (previewMesh && _Controller_Mesh[index] == null)
+        {
+            _Controller_Mesh[index] = new PreviewableController();
+        }
+        _Controller_Mesh[index].Preview(previewMesh);
+
 
         if (tracked)
         {
-            int index = wrapper.TrackedDevices.IndexesByClasses["Controller"][0];
+            int id = wrapper.TrackedDevices.IndexesByClasses["Controller"][index];
 
-            _Controller1_CurrentTrackedDevice = wrapper.TrackedDevices.AllDevices[index];
-            _Controller1_CurrentTrackedDevice.ConvertPose();
+            _Controller_CurrentTrackedDevice[index] = wrapper.TrackedDevices.AllDevices[id];
+            _Controller_CurrentTrackedDevice[index].ConvertPose();
 
-            _Controller1_CurrentCS = CoordinateSystem.Identity();
-            using (CoordinateSystem cm = Util.Matrix4x4ToCoordinateSystem(_Controller1_CurrentTrackedDevice.CorrectedMatrix4x4, false))
+            _Controller_CurrentCS[index] = CoordinateSystem.Identity();
+            using (CoordinateSystem cm = Util.Matrix4x4ToCoordinateSystem(_Controller_CurrentTrackedDevice[index].CorrectedMatrix4x4, false))
             {
-                _Controller1_CurrentCS = _Controller1_CurrentCS.Transform(cm);
+                _Controller_CurrentCS[index] = _Controller_CurrentCS[index].Transform(cm);
             }
 
-            _Controller1_OldCS = _Controller1_CurrentCS;
+            _Controller_OldCS[index] = _Controller_CurrentCS[index];
 
             if (previewColor == null)
             {
-                _Controller1_Mesh.MeshColor(_Controller1_MeshDefaultColor.Red, _Controller1_MeshDefaultColor.Green, _Controller1_MeshDefaultColor.Blue, _Controller1_MeshDefaultColor.Alpha);
+                _Controller_Mesh[index].MeshColor(_Controller_MeshDefaultColor.Red, _Controller_MeshDefaultColor.Green, _Controller_MeshDefaultColor.Blue, _Controller_MeshDefaultColor.Alpha);
             }
             else
             {
-                _Controller1_Mesh.MeshColor(previewColor.Red, previewColor.Green, previewColor.Blue, previewColor.Alpha);
+                _Controller_Mesh[index].MeshColor(previewColor.Red, previewColor.Green, previewColor.Blue, previewColor.Alpha);
             }
             
-            _Controller1_Mesh.Transform(_Controller1_OldCS);
+            _Controller_Mesh[index].Transform(_Controller_OldCS[index]);
 
-            _Controller1_CurrentTrackedDevice.GetControllerTriggerState();
+            _Controller_CurrentTrackedDevice[index].GetControllerTriggerState();
         }
 
         return new Dictionary<string, object>()
         {
-            { "Mesh", _Controller1_Mesh },
-            { "CoordinateSystem", _Controller1_OldCS },
-            { "TriggerPressed", _Controller1_CurrentTrackedDevice.TriggerPressed },
-            { "TriggerClicked", _Controller1_CurrentTrackedDevice.TriggerClicked },
-            { "TriggerValue", _Controller1_CurrentTrackedDevice.TriggerValue },
-            { "TouchPadTouched", _Controller1_CurrentTrackedDevice.TouchPadTouched },
-            { "TouchPadClicked", _Controller1_CurrentTrackedDevice.TouchPadClicked },
-            { "TouchPadValueX", _Controller1_CurrentTrackedDevice.TouchPadValueX },
-            { "TouchPadValueY", _Controller1_CurrentTrackedDevice.TouchPadValueY }
+            { "Mesh", _Controller_Mesh[index] },
+            { "CoordinateSystem", _Controller_OldCS[index] },
+            { "TriggerPressed", _Controller_CurrentTrackedDevice[index].TriggerPressed },
+            { "TriggerClicked", _Controller_CurrentTrackedDevice[index].TriggerClicked },
+            { "TriggerValue", _Controller_CurrentTrackedDevice[index].TriggerValue },
+            { "TouchPadTouched", _Controller_CurrentTrackedDevice[index].TouchPadTouched },
+            { "TouchPadClicked", _Controller_CurrentTrackedDevice[index].TouchPadClicked },
+            { "TouchPadValueX", _Controller_CurrentTrackedDevice[index].TouchPadValueX },
+            { "TouchPadValueY", _Controller_CurrentTrackedDevice[index].TouchPadValueY }
         };
     }
 
 
-
-    private static VrTrackedDevice _Controller2_CurrentTrackedDevice;
-    private static CoordinateSystem _Controller2_CurrentCS;
-    private static CoordinateSystem _Controller2_OldCS;
-    private static PreviewableController _Controller2_Mesh = new PreviewableController();
-    private static Color _Controller2_MeshDefaultColor = Color.ByARGB(255, 142, 242, 109);
-
-    /// <summary>
-    /// Tracking of HTC Vive Controller #2.
-    /// </summary>
-    /// <param name="Vive">The Vive object to read from.</param>
-    /// <param name="tracked">Should the device be tracked?</param>
-    /// <param name="previewMesh">Render a preview mesh of the device? Will slow things down...</param>
-    /// <returns name = "Mesh">Mesh representation of the device.</returns>
-    /// <returns name = "CoordinateSystem">The device's CoordinateSystem.</returns>
-    /// <returns name = "TriggerPressed">Is the trigger pressed?</returns>
-    /// <returns name = "TriggerClicked">Is the trigger clicked (pressed all the way in)?</returns>
-    /// <returns name = "TriggerValue">Trigger level from 0 (not pressed) to 1 (fully pressed).</returns>
-    /// <returns name = "TouchPadTouched">Is the touchpad being touched?</returns>
-    /// <returns name = "TouchPadClicked">Is the touchpad being clicked (pressed all the way in)?</returns>
-    /// <returns name = "TouchPadValueX">Touch value from -1 (left) to 1 (right).</returns>
-    /// <returns name = "TouchPadValueY">Touch value from -1 (bottom) to 1 (top).</returns>
-    [MultiReturn(new[] { "Mesh", "CoordinateSystem", "TriggerPressed", "TriggerClicked", "TriggerValue", "TouchPadTouched", "TouchPadClicked", "TouchPadValueX", "TouchPadValueY" })]
-    public static Dictionary<string, object> Controller2(object Vive,
-        [DefaultArgumentAttribute("true")]bool tracked,
-        [DefaultArgumentAttribute("true")]bool previewMesh,
-        [DefaultArgumentAttribute("Color.ByARGB(255, 142, 242, 109)")]Color previewColor)
-    {
-        OpenvrWrapper wrapper;
-        try
-        {
-            wrapper = Vive as OpenvrWrapper;
-        }
-        catch
-        {
-            DynamoServices.LogWarningMessageEvents.OnLogWarningMessage("Please connect a Vive object to this node's input.");
-            return null;
-        }
-
-        var list = wrapper.TrackedDevices.IndexesByClasses["Controller"];
-        if (list.Count == 0)
-        {
-            DynamoServices.LogWarningMessageEvents.OnLogWarningMessage("No Controller detected.");
-            return null;
-        }
-
-        _Controller2_Mesh.Preview(previewMesh);
-
-        if (tracked)
-        {
-            int index = wrapper.TrackedDevices.IndexesByClasses["Controller"][1];
-
-            _Controller2_CurrentTrackedDevice = wrapper.TrackedDevices.AllDevices[index];
-            _Controller2_CurrentTrackedDevice.ConvertPose();
-
-            _Controller2_CurrentCS = CoordinateSystem.Identity();
-            using (CoordinateSystem cm = Util.Matrix4x4ToCoordinateSystem(_Controller2_CurrentTrackedDevice.CorrectedMatrix4x4, false))
-            {
-                _Controller2_CurrentCS = _Controller2_CurrentCS.Transform(cm);
-            }
-
-            _Controller2_OldCS = _Controller2_CurrentCS;
-
-            if (previewColor == null)
-            {
-                _Controller2_Mesh.MeshColor(_Controller2_MeshDefaultColor.Red, _Controller2_MeshDefaultColor.Green, _Controller2_MeshDefaultColor.Blue, _Controller2_MeshDefaultColor.Alpha);
-            }
-            else
-            {
-                _Controller2_Mesh.MeshColor(previewColor.Red, previewColor.Green, previewColor.Blue, previewColor.Alpha);
-            }
-
-            _Controller2_Mesh.Transform(_Controller2_OldCS);
-
-            _Controller2_CurrentTrackedDevice.GetControllerTriggerState();
-        }
-
-        return new Dictionary<string, object>()
-        {
-            { "Mesh", _Controller2_Mesh },
-            { "CoordinateSystem", _Controller2_OldCS },
-            { "TriggerPressed", _Controller2_CurrentTrackedDevice.TriggerPressed },
-            { "TriggerClicked", _Controller2_CurrentTrackedDevice.TriggerClicked },
-            { "TriggerValue", _Controller2_CurrentTrackedDevice.TriggerValue },
-            { "TouchPadTouched", _Controller2_CurrentTrackedDevice.TouchPadTouched },
-            { "TouchPadClicked", _Controller2_CurrentTrackedDevice.TouchPadClicked },
-            { "TouchPadValueX", _Controller2_CurrentTrackedDevice.TouchPadValueX },
-            { "TouchPadValueY", _Controller2_CurrentTrackedDevice.TouchPadValueY }
-        };
-    }
+    
 
 
 
@@ -483,7 +401,7 @@ public class Devices
     private static Color _GenericTracker_MeshDefaultColor = Color.ByARGB(255, 244, 149, 66);
 
     /// <summary>
-    /// Tracking of HTC Vive Generic Tracker.
+    /// Tracking of HTC Vive Generic Trackers.
     /// </summary>
     /// <param name="Vive">The Vive object to read from.</param>
     /// <param name="index">If more than one Tracker, choose index number.</param>

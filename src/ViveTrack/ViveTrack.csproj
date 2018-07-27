@@ -155,22 +155,18 @@
     <Content Include="openvr_api.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <None Include="Resources\Devices.Lighthouse.Small.png" />
+    <None Include="Resources\Devices.Lighthouse.Large.png" />
+    <None Include="Resources\Devices.Controller.Large.png" />
+    <None Include="Resources\Devices.Controller.Small.png" />
     <None Include="Resources\Start.ConnectToVive.Small.png" />
     <None Include="Resources\Start.ConnectToVive.Large.png" />
     <None Include="Resources\Start.CalibrateOrigin.Small.png" />
     <None Include="Resources\Start.CalibrateOrigin.Large.png" />
-    <None Include="Resources\Devices.Lighthouse2.Small.png" />
-    <None Include="Resources\Devices.Lighthouse2.Large.png" />
-    <None Include="Resources\Devices.Lighthouse1.Small.png" />
-    <None Include="Resources\Devices.Lighthouse1.Large.png" />
     <None Include="Resources\Devices.HMD.Small.png" />
     <None Include="Resources\Devices.HMD.Large.png" />
     <None Include="Resources\Devices.GenericTracker.Small.png" />
     <None Include="Resources\Devices.GenericTracker.Large.png" />
-    <None Include="Resources\Devices.Controller2.Small.png" />
-    <None Include="Resources\Devices.Controller2.Large.png" />
-    <None Include="Resources\Devices.Controller1.Small.png" />
-    <None Include="Resources\Devices.Controller1.Large.png" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\ViveTrackImages.resx" />
