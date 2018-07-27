@@ -33,16 +33,17 @@ public class Devices
     //                             
 
     // Due to Zero Touch nature, these instances will be shared by all nodes... Not ideal, but good enough for 99% of situations.
-    private static VrTrackedDevice _HMD_CurrentTrackedDevice;
-    private static CoordinateSystem _HMD_CurrentCS;
-    private static CoordinateSystem _HMD_OldCS;
-    private static PreviewableHMD _HMD_Mesh = new PreviewableHMD();
+    private static VrTrackedDevice[] _HMD_CurrentTrackedDevice = new VrTrackedDevice[8];
+    private static CoordinateSystem[] _HMD_CurrentCS = new CoordinateSystem[8];
+    private static CoordinateSystem[] _HMD_OldCS = new CoordinateSystem[8];
+    private static PreviewableHMD[] _HMD_Mesh = new PreviewableHMD[8];
     private static Color _HMD_MeshDefaultColor = Color.ByARGB(255, 133, 191, 242);
 
     /// <summary>
     /// Tracking of HTC Vive Head Mounted Display (HMD).
     /// </summary>
     /// <param name="Vive">The Vive object to read from.</param>
+    /// <param name="index">If more than one Tracker, choose index number.</param>
     /// <param name="tracked">Should the device be tracked?</param>
     /// <param name="previewMesh">Render a preview mesh of the device? Will slow things down...</param>
     /// <param name="previewColor">Color to shade the preview mesh with.</param>
@@ -50,6 +51,7 @@ public class Devices
     /// <returns name = "CoordinateSystem">The device's CoordinateSystem.</returns>
     [MultiReturn(new[] { "Mesh", "CoordinateSystem" })]
     public static Dictionary<string, object> HMD(object Vive,
+        [DefaultArgumentAttribute("0")]int index,
         [DefaultArgumentAttribute("true")]bool tracked,
         [DefaultArgumentAttribute("true")]bool previewMesh,
         [DefaultArgumentAttribute("Color.ByARGB(255, 133, 191, 242)")]Color previewColor)
@@ -66,47 +68,52 @@ public class Devices
         }
 
         var list = wrapper.TrackedDevices.IndexesByClasses["HMD"];
-        if (list.Count == 0)
+        if (list.Count < index + 1)
         {
             DynamoServices.LogWarningMessageEvents.OnLogWarningMessage("No HMD detected.");
             return null;
         }
 
-        _HMD_Mesh.Preview(previewMesh);
+        if (previewMesh && _HMD_Mesh[index] == null)
+        {
+            _HMD_Mesh[index] = new PreviewableHMD();
+        }
+        _HMD_Mesh[index].Preview(previewMesh);
+        
 
         if (tracked)
         {
-            int index = wrapper.TrackedDevices.IndexesByClasses["HMD"][0];
+            int id = wrapper.TrackedDevices.IndexesByClasses["HMD"][index];
 
-            _HMD_CurrentTrackedDevice = wrapper.TrackedDevices.AllDevices[index];
-            _HMD_CurrentTrackedDevice.ConvertPose();
+            _HMD_CurrentTrackedDevice[index] = wrapper.TrackedDevices.AllDevices[id];
+            _HMD_CurrentTrackedDevice[index].ConvertPose();
 
-            _HMD_CurrentCS = CoordinateSystem.Identity();
-            using (CoordinateSystem cm = Util.Matrix4x4ToCoordinateSystem(_HMD_CurrentTrackedDevice.CorrectedMatrix4x4, false))
+            _HMD_CurrentCS[index] = CoordinateSystem.Identity();
+            using (CoordinateSystem cm = Util.Matrix4x4ToCoordinateSystem(_HMD_CurrentTrackedDevice[index].CorrectedMatrix4x4, false))
             {
-                _HMD_CurrentCS = _HMD_CurrentCS.Transform(cm);
+                _HMD_CurrentCS[index] = _HMD_CurrentCS[index].Transform(cm);
             }
 
-            _HMD_OldCS = _HMD_CurrentCS;
+            _HMD_OldCS[index] = _HMD_CurrentCS[index];
             
             // Turns out, for some reason, nodes don't take Color as a DefaultArgumentAttribute... because it's a DSCore object?
             // So, left the "fake" declaration on the input for user feedback, but handle the incorrect population of the input with an internal default.
             if (previewColor == null)
             {
-                _HMD_Mesh.MeshColor(_HMD_MeshDefaultColor.Red, _HMD_MeshDefaultColor.Green, _HMD_MeshDefaultColor.Blue, _HMD_MeshDefaultColor.Alpha);
+                _HMD_Mesh[index].MeshColor(_HMD_MeshDefaultColor.Red, _HMD_MeshDefaultColor.Green, _HMD_MeshDefaultColor.Blue, _HMD_MeshDefaultColor.Alpha);
             }
             else
             {
-                _HMD_Mesh.MeshColor(previewColor.Red, previewColor.Green, previewColor.Blue, previewColor.Alpha);
+                _HMD_Mesh[index].MeshColor(previewColor.Red, previewColor.Green, previewColor.Blue, previewColor.Alpha);
             }
             
-            _HMD_Mesh.Transform(_HMD_OldCS);
+            _HMD_Mesh[index].Transform(_HMD_OldCS[index]);
         }
         
         return new Dictionary<string, object>()
         {
-            { "Mesh", _HMD_Mesh },
-            { "CoordinateSystem", _HMD_OldCS }
+            { "Mesh", _HMD_Mesh[index] },
+            { "CoordinateSystem", _HMD_OldCS[index] }
         };
     }
 
@@ -218,35 +225,38 @@ public class Devices
     }
 
 
-    
 
 
 
 
-    //  ██╗     ██╗ ██████╗ ██╗  ██╗████████╗██╗  ██╗ ██████╗ ██╗   ██╗███████╗███████╗███████╗
-    //  ██║     ██║██╔════╝ ██║  ██║╚══██╔══╝██║  ██║██╔═══██╗██║   ██║██╔════╝██╔════╝██╔════╝
-    //  ██║     ██║██║  ███╗███████║   ██║   ███████║██║   ██║██║   ██║███████╗█████╗  ███████╗
-    //  ██║     ██║██║   ██║██╔══██║   ██║   ██╔══██║██║   ██║██║   ██║╚════██║██╔══╝  ╚════██║
-    //  ███████╗██║╚██████╔╝██║  ██║   ██║   ██║  ██║╚██████╔╝╚██████╔╝███████║███████╗███████║
-    //  ╚══════╝╚═╝ ╚═════╝ ╚═╝  ╚═╝   ╚═╝   ╚═╝  ╚═╝ ╚═════╝  ╚═════╝ ╚══════╝╚══════╝╚══════╝
-    //                                                                                         
 
-    private static VrTrackedDevice _Lighthouse1_CurrentTrackedDevice;
-    private static CoordinateSystem _Lighthouse1_CurrentCS;
-    private static CoordinateSystem _Lighthouse1_OldCS;
-    private static PreviewableLighthouse _Lighthouse1_Mesh = new PreviewableLighthouse();
-    private static Color _Lighthouse1_MeshDefaultColor = Color.ByARGB(255, 242, 181, 232);
+
+
+    //  ██╗     ██╗ ██████╗ ██╗  ██╗████████╗██╗  ██╗ ██████╗ ██╗   ██╗███████╗███████╗
+    //  ██║     ██║██╔════╝ ██║  ██║╚══██╔══╝██║  ██║██╔═══██╗██║   ██║██╔════╝██╔════╝
+    //  ██║     ██║██║  ███╗███████║   ██║   ███████║██║   ██║██║   ██║███████╗█████╗  
+    //  ██║     ██║██║   ██║██╔══██║   ██║   ██╔══██║██║   ██║██║   ██║╚════██║██╔══╝  
+    //  ███████╗██║╚██████╔╝██║  ██║   ██║   ██║  ██║╚██████╔╝╚██████╔╝███████║███████╗
+    //  ╚══════╝╚═╝ ╚═════╝ ╚═╝  ╚═╝   ╚═╝   ╚═╝  ╚═╝ ╚═════╝  ╚═════╝ ╚══════╝╚══════╝
+
+    private static VrTrackedDevice[] _Lighthouse_CurrentTrackedDevice = new VrTrackedDevice[8];
+    private static CoordinateSystem[] _Lighthouse_CurrentCS = new CoordinateSystem[8];
+    private static CoordinateSystem[] _Lighthouse_OldCS = new CoordinateSystem[8];
+    private static PreviewableLighthouse[] _Lighthouse_Mesh = new PreviewableLighthouse[8];
+    private static Color _Lighthouse_MeshDefaultColor = Color.ByARGB(255, 242, 181, 232);
 
     /// <summary>
-    /// Tracking of HTC Vive Lighthouse #1.
+    /// Tracking of HTC Vive Lighthouses.
     /// </summary>
     /// <param name="Vive">The Vive object to read from.</param>
+    /// <param name="index">If more than one Tracker, choose index number.</param>
     /// <param name="tracked">Should the device be tracked?</param>
     /// <param name="previewMesh">Render a preview mesh of the device? Will slow things down...</param>
     /// <returns name = "Mesh">Mesh representation of the device.</returns>
     /// <returns name = "CoordinateSystem">The device's CoordinateSystem.</returns>
     [MultiReturn(new[] { "Mesh", "CoordinateSystem" })]
-    public static Dictionary<string, object> Lighthouse1(object Vive,
+    public static Dictionary<string, object> Lighthouse(object Vive,
+        [DefaultArgumentAttribute("0")]int index,
         [DefaultArgumentAttribute("true")]bool tracked,
         [DefaultArgumentAttribute("true")]bool previewMesh,
         [DefaultArgumentAttribute("Color.ByARGB(255, 242, 181, 232)")]Color previewColor)
@@ -263,136 +273,63 @@ public class Devices
         }
 
         var list = wrapper.TrackedDevices.IndexesByClasses["Lighthouse"];
-        if (list.Count == 0)
+        if (list.Count < index + 1)
         {
             DynamoServices.LogWarningMessageEvents.OnLogWarningMessage("No Lighthouse detected.");
             return null;
         }
 
-        _Lighthouse1_Mesh.Preview(previewMesh);
+        if (previewMesh && _Lighthouse_Mesh[index] == null)
+        {
+            _Lighthouse_Mesh[index] = new PreviewableLighthouse();
+        }
+        _Lighthouse_Mesh[index].Preview(previewMesh);
 
         if (tracked)
         {
-            int index = wrapper.TrackedDevices.IndexesByClasses["Lighthouse"][0];
+            int id = wrapper.TrackedDevices.IndexesByClasses["Lighthouse"][index];
 
-            _Lighthouse1_CurrentTrackedDevice = wrapper.TrackedDevices.AllDevices[index];
-            _Lighthouse1_CurrentTrackedDevice.ConvertPose();
+            _Lighthouse_CurrentTrackedDevice[index] = wrapper.TrackedDevices.AllDevices[id];
+            _Lighthouse_CurrentTrackedDevice[index].ConvertPose();
 
-            _Lighthouse1_CurrentCS = CoordinateSystem.Identity();
-            using (CoordinateSystem cm = Util.Matrix4x4ToCoordinateSystem(_Lighthouse1_CurrentTrackedDevice.CorrectedMatrix4x4, false))
+            _Lighthouse_CurrentCS[index] = CoordinateSystem.Identity();
+            using (CoordinateSystem cm = Util.Matrix4x4ToCoordinateSystem(_Lighthouse_CurrentTrackedDevice[index].CorrectedMatrix4x4, false))
             {
-                _Lighthouse1_CurrentCS = _Lighthouse1_CurrentCS.Transform(cm);
+                _Lighthouse_CurrentCS[index] = _Lighthouse_CurrentCS[index].Transform(cm);
             }
 
-            _Lighthouse1_OldCS = _Lighthouse1_CurrentCS;
+            _Lighthouse_OldCS[index] = _Lighthouse_CurrentCS[index];
 
             if (previewColor == null)
             {
-                _Lighthouse1_Mesh.MeshColor(_Lighthouse1_MeshDefaultColor.Red, _Lighthouse1_MeshDefaultColor.Green, _Lighthouse1_MeshDefaultColor.Blue, _Lighthouse1_MeshDefaultColor.Alpha);
+                _Lighthouse_Mesh[index].MeshColor(_Lighthouse_MeshDefaultColor.Red, _Lighthouse_MeshDefaultColor.Green, _Lighthouse_MeshDefaultColor.Blue, _Lighthouse_MeshDefaultColor.Alpha);
             }
             else
             {
-                _Lighthouse1_Mesh.MeshColor(previewColor.Red, previewColor.Green, previewColor.Blue, previewColor.Alpha);
+                _Lighthouse_Mesh[index].MeshColor(previewColor.Red, previewColor.Green, previewColor.Blue, previewColor.Alpha);
             }
 
-            _Lighthouse1_Mesh.Transform(_Lighthouse1_OldCS);
+            _Lighthouse_Mesh[index].Transform(_Lighthouse_OldCS[index]);
 
         }
 
         return new Dictionary<string, object>()
         {
-            { "Mesh", _Lighthouse1_Mesh },
-            { "CoordinateSystem", _Lighthouse1_OldCS }
+            { "Mesh", _Lighthouse_Mesh[index] },
+            { "CoordinateSystem", _Lighthouse_OldCS[index] }
         };
     }
 
 
 
-    private static VrTrackedDevice _Lighthouse2_CurrentTrackedDevice;
-    private static CoordinateSystem _Lighthouse2_CurrentCS;
-    private static CoordinateSystem _Lighthouse2_OldCS;
-    private static PreviewableLighthouse _Lighthouse2_Mesh = new PreviewableLighthouse();
-    private static Color _Lighthouse2_MeshDefaultColor = Color.ByARGB(255, 242, 181, 232);
-
-    /// <summary>
-    /// Tracking of HTC Vive Lighthouse #2.
-    /// </summary>
-    /// <param name="Vive">The Vive object to read from.</param>
-    /// <param name="tracked">Should the device be tracked?</param>
-    /// <param name="previewMesh">Render a preview mesh of the device? Will slow things down...</param>
-    /// <returns name = "Mesh">Mesh representation of the device.</returns>
-    /// <returns name = "CoordinateSystem">The device's CoordinateSystem.</returns>
-    [MultiReturn(new[] { "Mesh", "CoordinateSystem" })]
-    public static Dictionary<string, object> Lighthouse2(object Vive,
-        [DefaultArgumentAttribute("true")]bool tracked,
-        [DefaultArgumentAttribute("true")]bool previewMesh,
-        [DefaultArgumentAttribute("Color.ByARGB(255, 242, 181, 232)")]Color previewColor)
-    {
-        OpenvrWrapper wrapper;
-        try
-        {
-            wrapper = Vive as OpenvrWrapper;
-        }
-        catch
-        {
-            DynamoServices.LogWarningMessageEvents.OnLogWarningMessage("Please connect a Vive object to this node's input.");
-            return null;
-        }
-
-        var list = wrapper.TrackedDevices.IndexesByClasses["Lighthouse"];
-        if (list.Count == 0)
-        {
-            DynamoServices.LogWarningMessageEvents.OnLogWarningMessage("No Lighthouse detected.");
-            return null;
-        }
-
-        _Lighthouse2_Mesh.Preview(previewMesh);
-
-        if (tracked)
-        {
-            int index = wrapper.TrackedDevices.IndexesByClasses["Lighthouse"][1];
-
-            _Lighthouse2_CurrentTrackedDevice = wrapper.TrackedDevices.AllDevices[index];
-            _Lighthouse2_CurrentTrackedDevice.ConvertPose();
-
-            _Lighthouse2_CurrentCS = CoordinateSystem.Identity();
-            using (CoordinateSystem cm = Util.Matrix4x4ToCoordinateSystem(_Lighthouse2_CurrentTrackedDevice.CorrectedMatrix4x4, false))
-            {
-                _Lighthouse2_CurrentCS = _Lighthouse2_CurrentCS.Transform(cm);
-            }
-
-            _Lighthouse2_OldCS = _Lighthouse2_CurrentCS;
-
-            if (previewColor == null)
-            {
-                _Lighthouse2_Mesh.MeshColor(_Lighthouse2_MeshDefaultColor.Red, _Lighthouse2_MeshDefaultColor.Green, _Lighthouse2_MeshDefaultColor.Blue, _Lighthouse2_MeshDefaultColor.Alpha);
-            }
-            else
-            {
-                _Lighthouse2_Mesh.MeshColor(previewColor.Red, previewColor.Green, previewColor.Blue, previewColor.Alpha);
-            }
-            
-            _Lighthouse2_Mesh.Transform(_Lighthouse2_OldCS);
-
-        }
 
 
-        return new Dictionary<string, object>()
-        {
-            { "Mesh", _Lighthouse2_Mesh },
-            { "CoordinateSystem", _Lighthouse2_OldCS }
-        };
-    }
-
-
-
-    //  ████████╗██████╗  █████╗  ██████╗██╗  ██╗███████╗██████╗ 
-    //  ╚══██╔══╝██╔══██╗██╔══██╗██╔════╝██║ ██╔╝██╔════╝██╔══██╗
-    //     ██║   ██████╔╝███████║██║     █████╔╝ █████╗  ██████╔╝
-    //     ██║   ██╔══██╗██╔══██║██║     ██╔═██╗ ██╔══╝  ██╔══██╗
-    //     ██║   ██║  ██║██║  ██║╚██████╗██║  ██╗███████╗██║  ██║
-    //     ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝
-    //                                                           
+    //   ██████╗ ███████╗███╗   ██╗███████╗██████╗ ██╗ ██████╗████████╗██████╗  █████╗  ██████╗██╗  ██╗███████╗██████╗ 
+    //  ██╔════╝ ██╔════╝████╗  ██║██╔════╝██╔══██╗██║██╔════╝╚══██╔══╝██╔══██╗██╔══██╗██╔════╝██║ ██╔╝██╔════╝██╔══██╗
+    //  ██║  ███╗█████╗  ██╔██╗ ██║█████╗  ██████╔╝██║██║        ██║   ██████╔╝███████║██║     █████╔╝ █████╗  ██████╔╝
+    //  ██║   ██║██╔══╝  ██║╚██╗██║██╔══╝  ██╔══██╗██║██║        ██║   ██╔══██╗██╔══██║██║     ██╔═██╗ ██╔══╝  ██╔══██╗
+    //  ╚██████╔╝███████╗██║ ╚████║███████╗██║  ██║██║╚██████╗   ██║   ██║  ██║██║  ██║╚██████╗██║  ██╗███████╗██║  ██║
+    //   ╚═════╝ ╚══════╝╚═╝  ╚═══╝╚══════╝╚═╝  ╚═╝╚═╝ ╚═════╝   ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝
 
     private static VrTrackedDevice[] _GenericTracker_CurrentTrackedDevice = new VrTrackedDevice[8];
     private static CoordinateSystem[] _GenericTracker_CurrentCS = new CoordinateSystem[8];
