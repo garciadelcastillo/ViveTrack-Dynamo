@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-public class PreviewableHMD : PreviewableMesh
+class PreviewableHMD : PreviewableMesh
 {
     internal override float[] Vertices { get { return _vertices; } }
     internal override float[] Normals { get { return _normals; } }

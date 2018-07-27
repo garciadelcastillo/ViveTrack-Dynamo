@@ -11,7 +11,7 @@ using Autodesk.DesignScript.Interfaces;
 using Autodesk.DesignScript.Geometry;
 
 
-public abstract class PreviewableMesh : IGraphicItem
+abstract class PreviewableMesh : IGraphicItem
 {
     internal abstract float[] Vertices { get; }
     internal abstract float[] Normals { get; }
@@ -21,6 +21,7 @@ public abstract class PreviewableMesh : IGraphicItem
     private float[] normalTrans;
     private bool _preview = true;
     private Matrix4x4 _transform;
+    private byte _red, _green, _blue, _alpha;
 
     internal PreviewableMesh()
     {
@@ -72,6 +73,13 @@ public abstract class PreviewableMesh : IGraphicItem
         _preview = preview;
     }
 
+    internal void MeshColor(byte r, byte g, byte b, byte a)
+    {
+        _red = r;
+        _green = g;
+        _blue = b;
+        _alpha = a;
+    }
 
     void IGraphicItem.Tessellate(IRenderPackage package, TessellationParameters parameters)
     {
@@ -82,7 +90,7 @@ public abstract class PreviewableMesh : IGraphicItem
         {
             fid = 3 * Faces[i];
             package.AddTriangleVertex(verticesTrans[fid], verticesTrans[fid + 1], verticesTrans[fid + 2]);
-            package.AddTriangleVertexColor(255, 0, 0, 255);
+            package.AddTriangleVertexColor(_red, _green, _blue, _alpha);
             package.AddTriangleVertexNormal(normalTrans[fid], normalTrans[fid + 1], normalTrans[fid + 2]);
             package.AddTriangleVertexUV(0, 0);
         }
