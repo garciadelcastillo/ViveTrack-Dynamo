@@ -133,6 +133,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DataRecorder.cs" />
     <Compile Include="Devices.cs" />
     <Compile Include="libs\LighthouseTracking.cs" />
     <Compile Include="libs\OpenvrWrapper.cs" />
