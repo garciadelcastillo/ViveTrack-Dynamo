@@ -72,6 +72,8 @@ public class Devices
             return null;
         }
 
+        _HMD_Mesh.Preview(previewMesh);
+
         if (tracked)
         {
             int index = wrapper.TrackedDevices.IndexesByClasses["HMD"][0];
@@ -97,7 +99,7 @@ public class Devices
             {
                 _HMD_Mesh.MeshColor(previewColor.Red, previewColor.Green, previewColor.Blue, previewColor.Alpha);
             }
-            _HMD_Mesh.Preview(previewMesh);
+            
             _HMD_Mesh.Transform(_HMD_OldCS);
         }
         
@@ -163,6 +165,8 @@ public class Devices
             return null;
         }
 
+        _Controller1_Mesh.Preview(previewMesh);
+
         if (tracked)
         {
             int index = wrapper.TrackedDevices.IndexesByClasses["Controller"][0];
@@ -186,7 +190,7 @@ public class Devices
             {
                 _Controller1_Mesh.MeshColor(previewColor.Red, previewColor.Green, previewColor.Blue, previewColor.Alpha);
             }
-            _Controller1_Mesh.Preview(previewMesh);
+            
             _Controller1_Mesh.Transform(_Controller1_OldCS);
 
             _Controller1_CurrentTrackedDevice.GetControllerTriggerState();
@@ -253,6 +257,8 @@ public class Devices
             return null;
         }
 
+        _Controller2_Mesh.Preview(previewMesh);
+
         if (tracked)
         {
             int index = wrapper.TrackedDevices.IndexesByClasses["Controller"][1];
@@ -276,7 +282,7 @@ public class Devices
             {
                 _Controller2_Mesh.MeshColor(previewColor.Red, previewColor.Green, previewColor.Blue, previewColor.Alpha);
             }
-            _Controller2_Mesh.Preview(previewMesh);
+
             _Controller2_Mesh.Transform(_Controller2_OldCS);
 
             _Controller2_CurrentTrackedDevice.GetControllerTriggerState();
@@ -345,6 +351,7 @@ public class Devices
             return null;
         }
 
+        _Lighthouse1_Mesh.Preview(previewMesh);
 
         if (tracked)
         {
@@ -369,11 +376,10 @@ public class Devices
             {
                 _Lighthouse1_Mesh.MeshColor(previewColor.Red, previewColor.Green, previewColor.Blue, previewColor.Alpha);
             }
-            _Lighthouse1_Mesh.Preview(previewMesh);
+
             _Lighthouse1_Mesh.Transform(_Lighthouse1_OldCS);
 
         }
-
 
         return new Dictionary<string, object>()
         {
@@ -422,6 +428,7 @@ public class Devices
             return null;
         }
 
+        _Lighthouse2_Mesh.Preview(previewMesh);
 
         if (tracked)
         {
@@ -446,7 +453,7 @@ public class Devices
             {
                 _Lighthouse2_Mesh.MeshColor(previewColor.Red, previewColor.Green, previewColor.Blue, previewColor.Alpha);
             }
-            _Lighthouse2_Mesh.Preview(previewMesh);
+            
             _Lighthouse2_Mesh.Transform(_Lighthouse2_OldCS);
 
         }
@@ -509,6 +516,12 @@ public class Devices
             return null;
         }
 
+        if (previewMesh && _GenericTracker_Mesh[index] == null)
+        {
+            _GenericTracker_Mesh[index] = new PreviewableGenericTracker();
+        }
+        _GenericTracker_Mesh[index].Preview(previewMesh);
+
         if (tracked)
         {
             int id = wrapper.TrackedDevices.IndexesByClasses["Tracker"][index];
@@ -525,21 +538,20 @@ public class Devices
 
             _GenericTracker_OldCS[index] = _GenericTracker_CurrentCS[index];
 
-            if (_GenericTracker_Mesh[index] == null)
-            {
-                _GenericTracker_Mesh[index] = new PreviewableGenericTracker();
-            }
 
-            if (previewColor == null)
+            if (previewMesh)
             {
-                _GenericTracker_Mesh[index].MeshColor(_GenericTracker_MeshDefaultColor.Red, _GenericTracker_MeshDefaultColor.Green, _GenericTracker_MeshDefaultColor.Blue, _GenericTracker_MeshDefaultColor.Alpha);
+                if (previewColor == null)
+                {
+                    _GenericTracker_Mesh[index].MeshColor(_GenericTracker_MeshDefaultColor.Red, _GenericTracker_MeshDefaultColor.Green, _GenericTracker_MeshDefaultColor.Blue, _GenericTracker_MeshDefaultColor.Alpha);
+                }
+                else
+                {
+                    _GenericTracker_Mesh[index].MeshColor(previewColor.Red, previewColor.Green, previewColor.Blue, previewColor.Alpha);
+                }
+
+                _GenericTracker_Mesh[index].Transform(_GenericTracker_OldCS[index]);
             }
-            else
-            {
-                _GenericTracker_Mesh[index].MeshColor(previewColor.Red, previewColor.Green, previewColor.Blue, previewColor.Alpha);
-            }
-            _GenericTracker_Mesh[index].Preview(previewMesh);
-            _GenericTracker_Mesh[index].Transform(_GenericTracker_OldCS[index]);
 
         }
 

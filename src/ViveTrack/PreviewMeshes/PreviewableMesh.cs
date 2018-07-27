@@ -40,6 +40,7 @@ abstract class PreviewableMesh : IGraphicItem
     internal void Transform(CoordinateSystem cs)
     {
         if (!_preview) return;
+
         _transform = Util.CoordinateSystemToMatrix4x4(cs);
 
         Vector3 v = new Vector3();
