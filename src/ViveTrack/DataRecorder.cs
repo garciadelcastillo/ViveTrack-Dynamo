@@ -31,7 +31,7 @@ public class DataRecorder
     /// <param name="data">Data to record.</param>
     /// <param name="record">Record data?</param>
     /// <param name="reset">Flush all data from the DataRecorder?</param>
-    /// <returns name = "recordedData"></returns>
+    /// <returns name = "recordedData">The data stored in the DataRecorder.</returns>
     public static List<object> Record(DataRecorder DataRecorder, object data, bool record = true, bool reset = false)
     {
         if (record)
