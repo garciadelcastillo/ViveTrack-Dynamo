@@ -1,0 +1,98 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>ViveTrack</name>
+    </assembly>
+    <members>
+        <member name="M:DataRecorder.Create">
+            <summary>
+            Create a DataRecorder object to store varying data.
+            </summary>
+            <returns name = "DataRecorder">The DataRecorder object.</returns>
+        </member>
+        <member name="M:DataRecorder.Record(DataRecorder,System.Object,System.Boolean,System.Boolean)">
+            <summary>
+            Record varying data in a DataRecorder. 
+            </summary>
+            <param name="DataRecorder">Plug a DataRecorder object.</param>
+            <param name="data">Data to record.</param>
+            <param name="record">Record data?</param>
+            <param name="reset">Flush all data from the DataRecorder?</param>
+            <returns name = "recordedData">The data stored in the DataRecorder.</returns>
+        </member>
+        <member name="M:Devices.HMD(System.Object,System.Int32,System.Boolean,System.Boolean,DSCore.Color)">
+            <summary>
+            Tracking of HTC Vive Head Mounted Display (HMD).
+            </summary>
+            <param name="Vive">The Vive object to read from.</param>
+            <param name="index">If more than one Tracker, choose index number.</param>
+            <param name="tracked">Should the device be tracked?</param>
+            <param name="previewMesh">Render a preview mesh of the device? Will slow things down...</param>
+            <param name="previewColor">Color to shade the preview mesh with.</param>
+            <returns name = "Mesh">Mesh representation of the device.</returns>
+            <returns name = "CoordinateSystem">The device's CoordinateSystem.</returns>
+        </member>
+        <member name="M:Devices.Controller(System.Object,System.Int32,System.Boolean,System.Boolean,DSCore.Color)">
+            <summary>
+            Tracking of HTC Vive Controllers.
+            </summary>
+            <param name="Vive">The Vive object to read from.</param>
+            <param name="index">If more than one Tracker, choose index number.</param>
+            <param name="tracked">Should the device be tracked?</param>
+            <param name="previewMesh">Render a preview mesh of the device? Will slow things down...</param>
+            <returns name = "Mesh">Mesh representation of the device.</returns>
+            <returns name = "CoordinateSystem">The device's CoordinateSystem.</returns>
+            <returns name = "TriggerPressed">Is the trigger pressed?</returns>
+            <returns name = "TriggerClicked">Is the trigger clicked (pressed all the way in)?</returns>
+            <returns name = "TriggerValue">Trigger level from 0 (not pressed) to 1 (fully pressed).</returns>
+            <returns name = "TouchPadTouched">Is the touchpad being touched?</returns>
+            <returns name = "TouchPadClicked">Is the touchpad being clicked (pressed all the way in)?</returns>
+            <returns name = "TouchPadValueX">Touch value from -1 (left) to 1 (right).</returns>
+            <returns name = "TouchPadValueY">Touch value from -1 (bottom) to 1 (top).</returns>
+        </member>
+        <member name="M:Devices.Lighthouse(System.Object,System.Int32,System.Boolean,System.Boolean,DSCore.Color)">
+            <summary>
+            Tracking of HTC Vive Lighthouses.
+            </summary>
+            <param name="Vive">The Vive object to read from.</param>
+            <param name="index">If more than one Tracker, choose index number.</param>
+            <param name="tracked">Should the device be tracked?</param>
+            <param name="previewMesh">Render a preview mesh of the device? Will slow things down...</param>
+            <returns name = "Mesh">Mesh representation of the device.</returns>
+            <returns name = "CoordinateSystem">The device's CoordinateSystem.</returns>
+        </member>
+        <member name="M:Devices.GenericTracker(System.Object,System.Int32,System.Boolean,System.Boolean,DSCore.Color)">
+            <summary>
+            Tracking of HTC Vive Generic Trackers.
+            </summary>
+            <param name="Vive">The Vive object to read from.</param>
+            <param name="index">If more than one Tracker, choose index number.</param>
+            <param name="tracked">Should the device be tracked?</param>
+            <param name="previewMesh">Render a preview mesh of the device? Will slow things down...</param>
+            <returns name = "Mesh">Mesh representation of the device.</returns>
+            <returns name = "CoordinateSystem">The device's CoordinateSystem.</returns>
+        </member>
+        <member name="M:Valve.VR.OpenVR.Init(Valve.VR.EVRInitError@,Valve.VR.EVRApplicationType)">
+            Finds the active installation of vrclient.dll and initializes it 
+        </member>
+        <member name="M:Valve.VR.OpenVR.Shutdown">
+            unloads vrclient.dll. Any interface pointers from the interface are
+            invalid after this point 
+        </member>
+        <member name="M:Start.ConnectToVive(System.Boolean)">
+            <summary>
+            Start HTC Vive. Make sure SteamVR is running, and Dynamo is set to Periodic update.
+            </summary>
+            <param name="Connect">Connect to SteamVR?</param>
+            <returns name = "Msg">Summary of the VR setting.</returns>
+            <returns name = "Vive">The main Vive object.</returns>
+        </member>
+        <member name="M:Start.CalibrateOrigin(Autodesk.DesignScript.Geometry.Plane,System.Boolean)">
+            <summary>
+            Reorient all the tracked devices according to the new Plane you set as origin plane.
+            </summary>
+            <param name="NewOriginPlane">New base Plane.</param>
+            <param name="calibrate">Should this plane be used for calibration?</param>
+        </member>
+    </members>
+</doc>

@@ -16,9 +16,9 @@ In `01_Hello_Vive.dyn` you can find an example that tracks the position of all p
 </p>
 
 ### Acknowledgments
-ViveTrack for Dynamo is a port from the [awesome project](https://github.com/ccc159/ViveTrack) by [Chen Jingcheng](https://github.com/ccc159).
+ViveTrack for Dynamo is a port from the [awesome project](https://github.com/ccc159/ViveTrack) by [Chen Jingcheng](https://github.com/ccc159). It is built using the [OpenVR](https://github.com/ValveSoftware/openvr) runtime.
 
-Package developed at the Generative Design Group at [Autodesk](https://www.autodesk.com).
+This package was developed at the Generative Design Group at [Autodesk](https://www.autodesk.com).
 
 Feel free to report issues and contribute.
 
