@@ -20,5 +20,5 @@ ViveTrack for Dynamo is a port from the [awesome project](https://github.com/ccc
 
 This package was developed at the Generative Design Group at [Autodesk](https://www.autodesk.com).
 
-Feel free to report issues and contribute. If you build something cool, [tweet me](https://twitter.com/garciadelcast).
+Feel free to report issues and contribute. If you build something cool, please [tweet me](https://twitter.com/garciadelcast).
 
