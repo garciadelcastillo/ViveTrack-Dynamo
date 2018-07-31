@@ -1,6 +1,6 @@
 # ViveTrack-Dynamo
 
-ViveTrack is [DynamoBIM](http://dynamobim.org/) package that allows real-time reading of HTC Vive spatial tracking data.
+ViveTrack is a [DynamoBIM](http://dynamobim.org/) package that allows real-time reading of HTC Vive spatial tracking data.
 
 ### Usage
 If you have a working HTC Vive set, just download this package from Dynamo's package manager and look at the sample files.

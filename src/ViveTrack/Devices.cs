@@ -72,14 +72,7 @@ public class Devices
         {
             DynamoServices.LogWarningMessageEvents.OnLogWarningMessage("No HMD detected.");
             return null;
-        }
-
-        if (previewMesh && _HMD_Mesh[index] == null)
-        {
-            _HMD_Mesh[index] = new PreviewableHMD();
-        }
-        _HMD_Mesh[index].Preview(previewMesh);
-        
+        }        
 
         if (tracked)
         {
@@ -96,6 +89,15 @@ public class Devices
 
             _HMD_OldCS[index] = _HMD_CurrentCS[index];
             
+        }
+
+        if (previewMesh)
+        {
+            if (_HMD_Mesh[index] == null)
+            {
+                _HMD_Mesh[index] = new PreviewableHMD();
+            }
+
             // Turns out, for some reason, nodes don't take Color as a DefaultArgumentAttribute... because it's a DSCore object?
             // So, left the "fake" declaration on the input for user feedback, but handle the incorrect population of the input with an internal default.
             if (previewColor == null)
@@ -106,10 +108,19 @@ public class Devices
             {
                 _HMD_Mesh[index].MeshColor(previewColor.Red, previewColor.Green, previewColor.Blue, previewColor.Alpha);
             }
-            
-            _HMD_Mesh[index].Transform(_HMD_OldCS[index]);
+
+            if (tracked)
+            {
+                _HMD_Mesh[index].Transform(_HMD_OldCS[index]);
+            }
+
+            _HMD_Mesh[index].Preview(true);
         }
-        
+        else if (_HMD_Mesh[index] != null)
+        {
+            _HMD_Mesh[index].Preview(false);
+        }
+
         return new Dictionary<string, object>()
         {
             { "Mesh", _HMD_Mesh[index] },
@@ -174,13 +185,7 @@ public class Devices
             return null;
         }
 
-        if (previewMesh && _Controller_Mesh[index] == null)
-        {
-            _Controller_Mesh[index] = new PreviewableController();
-        }
-        _Controller_Mesh[index].Preview(previewMesh);
-
-
+        
         if (tracked)
         {
             int id = wrapper.TrackedDevices.IndexesByClasses["Controller"][index];
@@ -195,6 +200,17 @@ public class Devices
             }
 
             _Controller_OldCS[index] = _Controller_CurrentCS[index];
+            
+            _Controller_CurrentTrackedDevice[index].GetControllerTriggerState();
+        }
+
+        
+        if (previewMesh)
+        {
+            if (_Controller_Mesh[index] == null)
+            {
+                _Controller_Mesh[index] = new PreviewableController();
+            }
 
             if (previewColor == null)
             {
@@ -204,15 +220,23 @@ public class Devices
             {
                 _Controller_Mesh[index].MeshColor(previewColor.Red, previewColor.Green, previewColor.Blue, previewColor.Alpha);
             }
-            
-            _Controller_Mesh[index].Transform(_Controller_OldCS[index]);
 
-            _Controller_CurrentTrackedDevice[index].GetControllerTriggerState();
+            if (tracked)
+            {
+                _Controller_Mesh[index].Transform(_Controller_OldCS[index]);
+            }
+
+            _Controller_Mesh[index].Preview(true);
         }
+        else if (_Controller_Mesh[index] != null)
+        {
+            _Controller_Mesh[index].Preview(false);
+        }
+        
 
         return new Dictionary<string, object>()
         {
-            { "Mesh", _Controller_Mesh[index] },
+            { "Mesh", _HMD_Mesh[index] },
             { "CoordinateSystem", _Controller_OldCS[index] },
             { "TriggerPressed", _Controller_CurrentTrackedDevice[index].TriggerPressed },
             { "TriggerClicked", _Controller_CurrentTrackedDevice[index].TriggerClicked },
@@ -279,12 +303,6 @@ public class Devices
             return null;
         }
 
-        if (previewMesh && _Lighthouse_Mesh[index] == null)
-        {
-            _Lighthouse_Mesh[index] = new PreviewableLighthouse();
-        }
-        _Lighthouse_Mesh[index].Preview(previewMesh);
-
         if (tracked)
         {
             int id = wrapper.TrackedDevices.IndexesByClasses["Lighthouse"][index];
@@ -300,6 +318,15 @@ public class Devices
 
             _Lighthouse_OldCS[index] = _Lighthouse_CurrentCS[index];
 
+        }
+
+        if (previewMesh)
+        {
+            if (_Lighthouse_Mesh[index] == null)
+            {
+                _Lighthouse_Mesh[index] = new PreviewableLighthouse();
+            }
+
             if (previewColor == null)
             {
                 _Lighthouse_Mesh[index].MeshColor(_Lighthouse_MeshDefaultColor.Red, _Lighthouse_MeshDefaultColor.Green, _Lighthouse_MeshDefaultColor.Blue, _Lighthouse_MeshDefaultColor.Alpha);
@@ -309,8 +336,16 @@ public class Devices
                 _Lighthouse_Mesh[index].MeshColor(previewColor.Red, previewColor.Green, previewColor.Blue, previewColor.Alpha);
             }
 
-            _Lighthouse_Mesh[index].Transform(_Lighthouse_OldCS[index]);
+            if (tracked)
+            {
+                _Lighthouse_Mesh[index].Transform(_Lighthouse_OldCS[index]);
+            }
 
+            _Lighthouse_Mesh[index].Preview(true);
+        }
+        else if (_Lighthouse_Mesh[index] != null)
+        {
+            _Lighthouse_Mesh[index].Preview(false);
         }
 
         return new Dictionary<string, object>()
@@ -371,12 +406,6 @@ public class Devices
             return null;
         }
 
-        if (previewMesh && _GenericTracker_Mesh[index] == null)
-        {
-            _GenericTracker_Mesh[index] = new PreviewableGenericTracker();
-        }
-        _GenericTracker_Mesh[index].Preview(previewMesh);
-
         if (tracked)
         {
             int id = wrapper.TrackedDevices.IndexesByClasses["Tracker"][index];
@@ -393,21 +422,35 @@ public class Devices
 
             _GenericTracker_OldCS[index] = _GenericTracker_CurrentCS[index];
 
+        }
 
-            if (previewMesh)
+
+        if (previewMesh)
+        {
+            if (_GenericTracker_Mesh[index] == null)
             {
-                if (previewColor == null)
-                {
-                    _GenericTracker_Mesh[index].MeshColor(_GenericTracker_MeshDefaultColor.Red, _GenericTracker_MeshDefaultColor.Green, _GenericTracker_MeshDefaultColor.Blue, _GenericTracker_MeshDefaultColor.Alpha);
-                }
-                else
-                {
-                    _GenericTracker_Mesh[index].MeshColor(previewColor.Red, previewColor.Green, previewColor.Blue, previewColor.Alpha);
-                }
+                _GenericTracker_Mesh[index] = new PreviewableGenericTracker();
+            }
 
+            if (previewColor == null)
+            {
+                _GenericTracker_Mesh[index].MeshColor(_GenericTracker_MeshDefaultColor.Red, _GenericTracker_MeshDefaultColor.Green, _GenericTracker_MeshDefaultColor.Blue, _GenericTracker_MeshDefaultColor.Alpha);
+            }
+            else
+            {
+                _GenericTracker_Mesh[index].MeshColor(previewColor.Red, previewColor.Green, previewColor.Blue, previewColor.Alpha);
+            }
+
+            if (tracked)
+            {
                 _GenericTracker_Mesh[index].Transform(_GenericTracker_OldCS[index]);
             }
 
+            _GenericTracker_Mesh[index].Preview(true);
+        }
+        else if (_GenericTracker_Mesh[index] != null)
+        {
+            _GenericTracker_Mesh[index].Preview(false);
         }
 
         return new Dictionary<string, object>()
