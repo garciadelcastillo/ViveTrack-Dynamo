@@ -75,5 +75,5 @@ public class DataRecorder
     {
         return _records;
     }
-
 }
+

@@ -4,6 +4,21 @@
         <name>ViveTrack</name>
     </assembly>
     <members>
+        <member name="M:Counter.Create">
+            <summary>
+            An object that increases by one unit with each update.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Counter.Tick(Counter,System.Boolean,System.Boolean)">
+            <summary>
+            Tick the Counter object to increase by one unit.
+            </summary>
+            <param name="counter"></param>
+            <param name="tick"></param>
+            <param name="reset"></param>
+            <returns></returns>
+        </member>
         <member name="M:DataRecorder.Create">
             <summary>
             Create a DataRecorder object to store varying data.
