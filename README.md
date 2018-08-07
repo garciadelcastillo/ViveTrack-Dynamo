@@ -12,7 +12,7 @@ In `01_Hello_Vive.dyn` you can find an example that tracks the position of all p
 `02_Surface_Painting.dyn` uses controller tracking and trigger buttons to trace a series of lines in space and loft them into a surface, via the `DataRecorder` goodie:
 
 <p align="center">
-<a href="https://youtu.be/h64ZFtlqzC0"><img width="640" height="343" src="assets/ViveTrackDynamo_surface_sculpting.gif"></a>
+<a target="_blank" href="https://youtu.be/h64ZFtlqzC0"><img width="640" height="343" src="assets/ViveTrackDynamo_surface_sculpting.gif"></a>
 </p>
 
 ### Projects
@@ -24,7 +24,7 @@ Some projects built with ViveTrack by the community:
 Lejla's uses trackers to [move a virtual camera inside a Revit model](http://bim-me-up.com/vivetrack-for-dynamo/) at Autodesk's VR Center in Munich.
 
 <p align="center">
-<a href="https://www.youtube.com/watch?v=WEIwpMWbxdc"><img src="assets/lejla_camera_tracking_revit.png"></a>
+<a target="_blank" href="https://www.youtube.com/watch?v=WEIwpMWbxdc"><img src="assets/lejla_camera_tracking_revit.png"></a>
 </p>
 
 
