@@ -21,7 +21,7 @@ If you build something cool, please [tweet me](https://twitter.com/garciadelcast
 
 Some projects built with ViveTrack by the community:
 
-Lejla's uses trackers to [move a virtual camera inside a Revit model](http://bim-me-up.com/vivetrack-for-dynamo/) at Autodesk's VR Center in Munich.
+Lejla's uses trackers to [move a virtual camera inside a Revit model](https://bim-me-up.com/index.php/2018/08/07/vivetrack-for-dynamo/) at Autodesk's VR Center in Munich.
 
 <p align="center">
 <a target="_blank" href="https://www.youtube.com/watch?v=WEIwpMWbxdc"><img src="assets/lejla_camera_tracking_revit.png"></a>
